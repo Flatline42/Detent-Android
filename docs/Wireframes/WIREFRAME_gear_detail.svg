@@ -1,0 +1,125 @@
+<svg viewBox="0 0 260 740" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .meta-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .screen-title { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .label { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .btn-label { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .btn-label-sm { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .prefix { font-family: sans-serif; font-size: 10px; fill: #aaa; }
+      .input-value { font-family: sans-serif; font-size: 10px; fill: #111; }
+      .placeholder { font-family: sans-serif; font-size: 10px; fill: #aaa; font-style: italic; }
+      .autocomplete { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .btn-primary { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .input { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .input-prefix { fill: #efefef; stroke: #ccc; stroke-width: 0.5; }
+      .dropdown { fill: #fff; stroke: #bbb; stroke-width: 0.5; }
+      .dropdown-item { fill: #fff; stroke: #e0e0e0; stroke-width: 0.5; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="720" rx="16" class="outer"/>
+
+  <rect x="10" y="10" width="240" height="34" rx="16" class="box"/>
+  <rect x="10" y="32" width="240" height="12" class="box"/>
+  <text x="22" y="28" class="small">←</text>
+  <text x="125" y="28" text-anchor="middle" class="screen-title">FD 50mm f/1.4</text>
+  <text x="238" y="28" text-anchor="end" class="small">⋯</text>
+  <text x="125" y="40" text-anchor="middle" class="small-muted">lens detail — editing</text>
+
+  <line x1="10" y1="44" x2="250" y2="44" class="divider"/>
+
+  <text x="20" y="58" class="label">name</text>
+  <rect x="20" y="62" width="210" height="22" rx="4" class="input"/>
+  <text x="30" y="77" class="input-value">FD 50mm f/1.4</text>
+
+  <text x="20" y="98" class="label">make</text>
+  <rect x="20" y="102" width="210" height="22" rx="4" class="input"/>
+  <text x="30" y="117" class="input-value">Canon</text>
+
+  <text x="20" y="138" class="label">focal length</text>
+  <rect x="20" y="142" width="80" height="22" rx="4" class="input"/>
+  <text x="30" y="157" class="input-value">50</text>
+  <text x="104" y="157" class="meta-muted">mm</text>
+
+  <text x="20" y="178" class="label">mount type</text>
+  <rect x="20" y="182" width="210" height="22" rx="4" class="input"/>
+  <text x="30" y="197" class="input-value">Canon FD</text>
+  <rect x="20" y="204" width="210" height="44" rx="4" class="dropdown"/>
+  <rect x="20" y="204" width="210" height="14" class="dropdown-item"/>
+  <text x="30" y="214" class="autocomplete">Canon FD</text>
+  <rect x="20" y="218" width="210" height="14" class="dropdown-item"/>
+  <text x="30" y="228" class="autocomplete">Canon EF</text>
+  <rect x="20" y="232" width="210" height="16" class="dropdown-item"/>
+  <text x="30" y="242" class="autocomplete">+ add new mount type</text>
+  <text x="180" y="220" class="annotation">autocomplete</text>
+  <text x="180" y="229" class="annotation">dropdown</text>
+
+  <text x="20" y="262" class="label">max aperture</text>
+  <rect x="20" y="266" width="28" height="22" rx="4" class="input-prefix"/>
+  <text x="34" y="281" text-anchor="middle" class="prefix">f/</text>
+  <rect x="48" y="266" width="52" height="22" rx="4" class="input"/>
+  <text x="58" y="281" class="input-value">1.4</text>
+
+  <text x="20" y="302" class="label">min aperture</text>
+  <rect x="20" y="306" width="28" height="22" rx="4" class="input-prefix"/>
+  <text x="34" y="321" text-anchor="middle" class="prefix">f/</text>
+  <rect x="48" y="306" width="52" height="22" rx="4" class="input"/>
+  <text x="58" y="321" class="input-value">16</text>
+
+  <text x="20" y="342" class="label">aperture increments</text>
+  <rect x="20" y="346" width="100" height="22" rx="4" class="btn"/>
+  <text x="70" y="361" text-anchor="middle" class="btn-label-sm">half stop  ▾</text>
+
+  <text x="20" y="382" class="label">filter size</text>
+  <rect x="20" y="386" width="52" height="22" rx="4" class="input"/>
+  <text x="30" y="401" class="input-value">52</text>
+  <rect x="76" y="386" width="28" height="22" rx="4" class="input-prefix"/>
+  <text x="90" y="401" text-anchor="middle" class="prefix">mm</text>
+  <text x="110" y="401" class="meta-muted">optional</text>
+
+  <text x="20" y="422" class="label">notes</text>
+  <rect x="20" y="426" width="210" height="36" rx="4" class="input"/>
+  <text x="30" y="444" class="input-value">soft at f/1.4, vignettes wide open</text>
+
+  <line x1="10" y1="472" x2="250" y2="472" class="divider"/>
+
+  <rect x="20" y="480" width="210" height="34" rx="6" class="btn-primary"/>
+  <text x="125" y="502" text-anchor="middle" class="btn-label">save lens</text>
+
+  <line x1="10" y1="524" x2="250" y2="524" class="divider"/>
+
+  <text x="20" y="536" class="annotation">filter detail example — same template, different fields</text>
+
+  <text x="20" y="550" class="label">name</text>
+  <rect x="20" y="554" width="210" height="22" rx="4" class="input"/>
+  <text x="30" y="569" class="input-value">Hoya HMC Yellow K2</text>
+
+  <text x="20" y="589" class="label">filter type</text>
+  <rect x="20" y="593" width="210" height="22" rx="4" class="input"/>
+  <text x="30" y="608" class="input-value">color</text>
+  <text x="180" y="608" class="annotation">autocomplete</text>
+
+  <text x="20" y="628" class="label">EV reduction</text>
+  <rect x="20" y="632" width="60" height="22" rx="4" class="input"/>
+  <text x="30" y="647" class="input-value">-1.0</text>
+  <text x="86" y="647" class="meta-muted">stops  ·  optional</text>
+
+  <text x="20" y="667" class="label">filter size</text>
+  <rect x="20" y="671" width="52" height="22" rx="4" class="input"/>
+  <text x="30" y="686" class="input-value">52</text>
+  <rect x="76" y="671" width="28" height="22" rx="4" class="input-prefix"/>
+  <text x="90" y="686" text-anchor="middle" class="prefix">mm</text>
+  <text x="110" y="686" class="meta-muted">optional</text>
+
+  <text x="258" y="300" class="annotation">scroll</text>
+  <line x1="254" y1="44" x2="254" y2="472" style="stroke:#ddd;stroke-width:0.5;stroke-dasharray:2,2;"/>
+</svg>

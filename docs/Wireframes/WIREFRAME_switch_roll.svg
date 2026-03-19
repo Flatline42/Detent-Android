@@ -1,0 +1,99 @@
+<svg viewBox="0 0 260 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .roll-name-tappable { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; text-decoration: underline; }
+      .value { font-family: sans-serif; font-size: 18px; font-weight: 500; fill: #111; }
+      .btn-label { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .btn-label-sm { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .sheet-title { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .roll-option { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .roll-option-meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .arrow { font-family: sans-serif; font-size: 16px; font-weight: 500; fill: #888; }
+      .chip-on { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .chip-text-on { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #111; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .logbtn { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .sheet { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .roll-row-active { fill: #f5f5f5; stroke: #888; stroke-width: 1; }
+      .roll-row { fill: #fff; stroke: #e0e0e0; stroke-width: 0.5; }
+      .radio-outer { fill: none; stroke: #888; stroke-width: 1; }
+      .radio-inner { fill: #888; }
+      .radio-empty { fill: none; stroke: #ccc; stroke-width: 1; }
+      .progress-bar-bg { fill: #efefef; }
+      .progress-bar-fill { fill: #888; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .handle { fill: #ccc; }
+      .tappable-indicator { fill: none; stroke: #888; stroke-width: 1; stroke-dasharray: 2,2; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="280" rx="16" class="outer"/>
+
+  <rect x="10" y="10" width="240" height="50" rx="16" class="box"/>
+  <rect x="10" y="48" width="240" height="12" class="box"/>
+  <text x="20" y="24" class="small-muted">active roll  ›  tap to switch</text>
+  <text x="20" y="40" class="roll-name-tappable">HP5 Plus — Canon AE-1  ›</text>
+  <text x="230" y="24" text-anchor="end" class="small">●● filters</text>
+  <text x="20" y="54" class="small-muted">Frame 14 / 38</text>
+  <text x="230" y="54" text-anchor="end" class="small-muted">-2.5 EV</text>
+  <rect x="10" y="28" width="200" height="20" rx="0" class="tappable-indicator"/>
+
+  <line x1="10" y1="62" x2="250" y2="62" class="divider"/>
+
+  <rect x="20" y="68" width="210" height="20" rx="4" class="box"/>
+  <text x="125" y="82" text-anchor="middle" class="btn-label-sm">FD 50mm f/1.4  ›</text>
+  <rect x="20" y="92" width="36" height="18" rx="9" class="chip-on"/>
+  <text x="38" y="105" text-anchor="middle" class="chip-text-on">YK2</text>
+  <rect x="60" y="92" width="28" height="18" rx="9" class="chip-on"/>
+  <text x="74" y="105" text-anchor="middle" class="chip-text-on">UV</text>
+
+  <line x1="10" y1="120" x2="250" y2="120" class="divider"/>
+
+  <rect x="32" y="128" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="155" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="128" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="155" text-anchor="middle" class="value">f/8</text>
+  <rect x="176" y="128" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="155" text-anchor="middle" class="arrow">+</text>
+
+  <rect x="32" y="178" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="205" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="178" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="205" text-anchor="middle" class="value">125</text>
+  <rect x="176" y="178" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="205" text-anchor="middle" class="arrow">+</text>
+
+  <rect x="20" y="228" width="210" height="24" rx="6" class="logbtn"/>
+  <text x="125" y="244" text-anchor="middle" class="btn-label-sm">log frame</text>
+
+  <line x1="10" y1="300" x2="250" y2="300" class="divider"/>
+
+  <text x="20" y="314" class="annotation">switch roll bottom sheet</text>
+
+  <rect x="10" y="320" width="240" height="170" rx="12" class="sheet"/>
+  <rect x="105" y="328" width="50" height="5" rx="3" class="handle"/>
+  <text x="125" y="350" text-anchor="middle" class="sheet-title">switch active roll</text>
+  <line x1="20" y1="358" x2="240" y2="358" class="divider"/>
+
+  <rect x="20" y="364" width="210" height="46" rx="6" class="roll-row-active"/>
+  <circle cx="34" cy="387" r="7" class="radio-outer"/>
+  <circle cx="34" cy="387" r="4" class="radio-inner"/>
+  <text x="48" y="382" class="roll-option">HP5 Plus — Canon AE-1</text>
+  <text x="48" y="394" class="roll-option-meta">14 / 38  ·  last shot 14:32</text>
+  <rect x="150" y="370" width="72" height="4" rx="2" class="progress-bar-bg"/>
+  <rect x="150" y="370" width="27" height="4" rx="2" class="progress-bar-fill"/>
+
+  <rect x="20" y="416" width="210" height="40" rx="6" class="roll-row"/>
+  <circle cx="34" cy="436" r="7" class="radio-empty"/>
+  <text x="48" y="431" class="roll-option">Ektar 100 — Canon F-1</text>
+  <text x="48" y="443" class="roll-option-meta">4 / 36  ·  last shot 3 days ago</text>
+
+  <text x="258" y="50" class="annotation">tappable</text>
+  <text x="258" y="60" class="annotation">header</text>
+</svg>

@@ -1,0 +1,95 @@
+flowchart TD
+    INSTALL([Fresh Install]) --> WELCOME
+
+    subgraph ONBOARDING["Onboarding (first run only)"]
+        WELCOME[Welcome Screen]
+        WELCOME -->|Show me around| OB_LENS[Add First Lens]
+        WELCOME -->|Skip setup| QUICK
+        OB_LENS --> OB_BODY[Add First Camera Body]
+        OB_BODY --> OB_STOCK[Add First Film Stock]
+        OB_STOCK --> OB_ROLL[Load First Roll]
+        OB_ROLL --> OB_WIDGET[Widget Setup Instructions]
+        OB_WIDGET --> QUICK
+    end
+
+    subgraph NAV["Bottom Navigation"]
+        QUICK[Quick Screen]
+        JOURNAL[Active Roll Journal]
+        ROLLS[Roll List]
+        GEAR[Gear Library]
+        SETTINGS[Settings]
+    end
+
+    subgraph LAYER2["Quick Screen (Layer 2)"]
+        QUICK --> QS_HEADER[Tappable Roll Header]
+        QS_HEADER -->|Multiple loaded rolls| SWITCH_ROLL[Switch Roll Bottom Sheet]
+        SWITCH_ROLL -->|Select roll| QUICK
+        QUICK --> QS_LENS[Lens Selector]
+        QUICK --> QS_FILTER[Filter Chips + EV Sum]
+        QUICK --> QS_EXPCOMP[Exposure Compensation]
+        QUICK --> QS_POINTER[Frame Pointer]
+        QUICK --> QS_APERTURE[Aperture Stepper]
+        QUICK --> QS_SHUTTER[Shutter Speed Stepper]
+        QUICK --> QS_NOTE[Note / Speech to Text]
+        QUICK --> QS_LOG[Log Frame Button]
+        QS_LOG -->|Writes to| ROLL_JOURNAL
+    end
+
+    subgraph LAYER3["Roll Management (Layer 3)"]
+        ROLLS -->|Tab: Active — loaded| ROLLS_LOADED[Loaded Rolls]
+        ROLLS -->|Tab: Active — unloaded| ROLLS_UNLOADED[Unloaded Rolls]
+        ROLLS -->|Tab: Finished| ROLLS_FINISHED[Finished Rolls]
+        ROLLS -->|Tab: Archived| ROLLS_ARCHIVED[Archived Rolls]
+        ROLLS_LOADED & ROLLS_UNLOADED & ROLLS_FINISHED & ROLLS_ARCHIVED -->|Tap roll card| ROLL_JOURNAL[Roll Journal View]
+        ROLLS_UNLOADED -->|Swipe left or right| LOAD_CONFIRM[Load Roll Confirmation]
+        LOAD_CONFIRM -->|Confirm| ROLLS_LOADED
+        ROLLS -->|FAB +| ROLL_SETUP[Roll Setup]
+        ROLL_SETUP -->|Optional| KIT_SELECT[Kit Selector]
+        KIT_SELECT -->|Select kit| ROLL_SETUP
+        KIT_SELECT -->|FAB +| KIT_DETAIL[Kit Detail / Edit]
+        KIT_DETAIL --> KIT_SELECT
+        ROLL_SETUP -->|Create Roll| ROLLS_UNLOADED
+        ROLL_SETUP -->|Create + Load Roll| ROLLS_LOADED
+        ROLL_JOURNAL -->|Tap frame| FRAME_DETAIL[Frame Detail / Edit]
+        JOURNAL -->|Tap frame| FRAME_DETAIL
+        ROLL_JOURNAL -->|Load Roll button| LOAD_CONFIRM
+        ROLL_JOURNAL -->|Finish Roll| ROLLS_FINISHED
+        ROLLS_FINISHED -->|Archive| ROLLS_ARCHIVED
+        ROLLS_ARCHIVED -->|Unarchive| ROLLS_FINISHED
+        ROLL_JOURNAL -->|Export| EXPORT[Export Bottom Sheet]
+    end
+
+    subgraph LAYER4["Gear Library (Layer 4)"]
+        GEAR -->|Tab| GEAR_LENSES[Lenses]
+        GEAR -->|Tab| GEAR_BODIES[Camera Bodies]
+        GEAR -->|Tab| GEAR_FILTERS[Filters]
+        GEAR -->|Tab| GEAR_STOCKS[Film Stocks]
+        GEAR -->|Tab| GEAR_KITS[Kits]
+        GEAR_LENSES -->|FAB + / tap item| GEAR_LENS_EDIT[Lens Detail / Edit]
+        GEAR_BODIES -->|FAB + / tap item| GEAR_BODY_EDIT[Body Detail / Edit]
+        GEAR_FILTERS -->|FAB + / tap item| GEAR_FILTER_EDIT[Filter Detail / Edit]
+        GEAR_STOCKS -->|FAB + / tap item| GEAR_STOCK_EDIT[Stock Detail / Edit]
+        GEAR_KITS -->|FAB + / tap item| GEAR_KIT_EDIT[Kit Detail / Edit]
+    end
+
+    subgraph SETTINGS_SUB["Settings"]
+        SETTINGS --> SET_GENERAL[Shooting Defaults]
+        SETTINGS --> SET_APPEARANCE[Appearance]
+        SETTINGS --> SET_BACKUP[Data and Backup]
+        SETTINGS --> SET_WIDGET[Widget Setup Instructions]
+        SETTINGS --> SET_ONBOARDING[Re-run Introduction]
+        SETTINGS --> SET_TIP[Tip Jar]
+        SETTINGS --> SET_ABOUT[About]
+    end
+
+    style QUICK fill:#C0392B,color:#fff
+    style JOURNAL fill:#1A1A2E,color:#fff
+    style ROLLS fill:#1A1A2E,color:#fff
+    style GEAR fill:#1A1A2E,color:#fff
+    style SETTINGS fill:#1A1A2E,color:#fff
+    style ONBOARDING fill:#f9f9f9,stroke:#ccc
+    style NAV fill:#f0f0f0,stroke:#999
+    style LAYER2 fill:#f9f9f9,stroke:#ccc
+    style LAYER3 fill:#f9f9f9,stroke:#ccc
+    style LAYER4 fill:#f9f9f9,stroke:#ccc
+    style SETTINGS_SUB fill:#f9f9f9,stroke:#ccc
