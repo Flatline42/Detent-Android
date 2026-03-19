@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew tasks:*)"
+      "Bash(./gradlew tasks:*)",
+      "mcp__basic-memory__list_memory_projects",
+      "mcp__basic-memory__write_note",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew compileDebugKotlin)"
     ]
   }
 }

@@ -1,0 +1,895 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "1857082a377b4cf4c0d540291f74ead5",
+    "entities": [
+      {
+        "tableName": "camera_bodies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `make` TEXT NOT NULL, `model` TEXT NOT NULL, `mountType` TEXT NOT NULL, `format` TEXT NOT NULL, `shutterIncrements` TEXT NOT NULL, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "make",
+            "columnName": "make",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "model",
+            "columnName": "model",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mountType",
+            "columnName": "mountType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "format",
+            "columnName": "format",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shutterIncrements",
+            "columnName": "shutterIncrements",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "lenses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `make` TEXT NOT NULL, `focalLengthMm` INTEGER NOT NULL, `mountType` TEXT NOT NULL, `maxAperture` REAL NOT NULL, `minAperture` REAL NOT NULL, `apertureIncrements` TEXT NOT NULL, `filterSizeMm` INTEGER, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "make",
+            "columnName": "make",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "focalLengthMm",
+            "columnName": "focalLengthMm",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mountType",
+            "columnName": "mountType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxAperture",
+            "columnName": "maxAperture",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minAperture",
+            "columnName": "minAperture",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "apertureIncrements",
+            "columnName": "apertureIncrements",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterSizeMm",
+            "columnName": "filterSizeMm",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "filters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `make` TEXT NOT NULL, `filterType` TEXT NOT NULL, `evReduction` REAL, `filterSizeMm` INTEGER, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "make",
+            "columnName": "make",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evReduction",
+            "columnName": "evReduction",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "filterSizeMm",
+            "columnName": "filterSizeMm",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "film_stocks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `make` TEXT NOT NULL, `iso` INTEGER NOT NULL, `format` TEXT NOT NULL, `defaultFrameCount` INTEGER NOT NULL, `colorType` TEXT NOT NULL, `discontinued` INTEGER NOT NULL, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "make",
+            "columnName": "make",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iso",
+            "columnName": "iso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "format",
+            "columnName": "format",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultFrameCount",
+            "columnName": "defaultFrameCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorType",
+            "columnName": "colorType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "discontinued",
+            "columnName": "discontinued",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "rolls",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `filmStockId` INTEGER NOT NULL, `cameraBodyId` INTEGER NOT NULL, `pushPull` INTEGER, `ratedISO` INTEGER NOT NULL, `filmExpiryDate` INTEGER, `totalExposures` INTEGER NOT NULL, `isLoaded` INTEGER NOT NULL, `gpsEnabled` INTEGER NOT NULL, `status` TEXT NOT NULL, `loadedAt` INTEGER NOT NULL, `finishedAt` INTEGER, `lastExportedAt` INTEGER, `notes` TEXT, FOREIGN KEY(`filmStockId`) REFERENCES `film_stocks`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`cameraBodyId`) REFERENCES `camera_bodies`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filmStockId",
+            "columnName": "filmStockId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cameraBodyId",
+            "columnName": "cameraBodyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pushPull",
+            "columnName": "pushPull",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ratedISO",
+            "columnName": "ratedISO",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filmExpiryDate",
+            "columnName": "filmExpiryDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalExposures",
+            "columnName": "totalExposures",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isLoaded",
+            "columnName": "isLoaded",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gpsEnabled",
+            "columnName": "gpsEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loadedAt",
+            "columnName": "loadedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "finishedAt",
+            "columnName": "finishedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastExportedAt",
+            "columnName": "lastExportedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_rolls_filmStockId",
+            "unique": false,
+            "columnNames": [
+              "filmStockId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rolls_filmStockId` ON `${TABLE_NAME}` (`filmStockId`)"
+          },
+          {
+            "name": "index_rolls_cameraBodyId",
+            "unique": false,
+            "columnNames": [
+              "cameraBodyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rolls_cameraBodyId` ON `${TABLE_NAME}` (`cameraBodyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "film_stocks",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filmStockId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "camera_bodies",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "cameraBodyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "roll_lenses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rollId` INTEGER NOT NULL, `lensId` INTEGER NOT NULL, `isPrimary` INTEGER NOT NULL, PRIMARY KEY(`rollId`, `lensId`), FOREIGN KEY(`rollId`) REFERENCES `rolls`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lensId`) REFERENCES `lenses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "rollId",
+            "columnName": "rollId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lensId",
+            "columnName": "lensId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPrimary",
+            "columnName": "isPrimary",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "rollId",
+            "lensId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_roll_lenses_lensId",
+            "unique": false,
+            "columnNames": [
+              "lensId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_roll_lenses_lensId` ON `${TABLE_NAME}` (`lensId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "rolls",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rollId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "lenses",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "lensId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "roll_filters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rollId` INTEGER NOT NULL, `filterId` INTEGER NOT NULL, PRIMARY KEY(`rollId`, `filterId`), FOREIGN KEY(`rollId`) REFERENCES `rolls`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`filterId`) REFERENCES `filters`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "rollId",
+            "columnName": "rollId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterId",
+            "columnName": "filterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "rollId",
+            "filterId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_roll_filters_filterId",
+            "unique": false,
+            "columnNames": [
+              "filterId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_roll_filters_filterId` ON `${TABLE_NAME}` (`filterId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "rolls",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rollId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "filters",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "frames",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rollId` INTEGER NOT NULL, `frameNumber` INTEGER NOT NULL, `isLogged` INTEGER NOT NULL, `loggedAt` INTEGER, `aperture` TEXT, `shutterSpeed` TEXT, `lensId` INTEGER, `exposureCompensation` REAL, `lat` REAL, `lng` REAL, `notes` TEXT, FOREIGN KEY(`rollId`) REFERENCES `rolls`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lensId`) REFERENCES `lenses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rollId",
+            "columnName": "rollId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frameNumber",
+            "columnName": "frameNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isLogged",
+            "columnName": "isLogged",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loggedAt",
+            "columnName": "loggedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "aperture",
+            "columnName": "aperture",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "shutterSpeed",
+            "columnName": "shutterSpeed",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lensId",
+            "columnName": "lensId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "exposureCompensation",
+            "columnName": "exposureCompensation",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "lng",
+            "columnName": "lng",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_frames_rollId",
+            "unique": false,
+            "columnNames": [
+              "rollId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_frames_rollId` ON `${TABLE_NAME}` (`rollId`)"
+          },
+          {
+            "name": "index_frames_lensId",
+            "unique": false,
+            "columnNames": [
+              "lensId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_frames_lensId` ON `${TABLE_NAME}` (`lensId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "rolls",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "rollId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "lenses",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "lensId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "frame_filters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`frameId` INTEGER NOT NULL, `filterId` INTEGER NOT NULL, PRIMARY KEY(`frameId`, `filterId`), FOREIGN KEY(`frameId`) REFERENCES `frames`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`filterId`) REFERENCES `filters`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "frameId",
+            "columnName": "frameId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterId",
+            "columnName": "filterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "frameId",
+            "filterId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_frame_filters_filterId",
+            "unique": false,
+            "columnNames": [
+              "filterId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_frame_filters_filterId` ON `${TABLE_NAME}` (`filterId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "frames",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "frameId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "filters",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "kits",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `cameraBodyId` INTEGER NOT NULL, `lastUsedAt` INTEGER, `notes` TEXT, FOREIGN KEY(`cameraBodyId`) REFERENCES `camera_bodies`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cameraBodyId",
+            "columnName": "cameraBodyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUsedAt",
+            "columnName": "lastUsedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_kits_cameraBodyId",
+            "unique": false,
+            "columnNames": [
+              "cameraBodyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_kits_cameraBodyId` ON `${TABLE_NAME}` (`cameraBodyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "camera_bodies",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "cameraBodyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "kit_lenses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`kitId` INTEGER NOT NULL, `lensId` INTEGER NOT NULL, `isPrimary` INTEGER NOT NULL, PRIMARY KEY(`kitId`, `lensId`), FOREIGN KEY(`kitId`) REFERENCES `kits`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lensId`) REFERENCES `lenses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "kitId",
+            "columnName": "kitId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lensId",
+            "columnName": "lensId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPrimary",
+            "columnName": "isPrimary",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "kitId",
+            "lensId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_kit_lenses_lensId",
+            "unique": false,
+            "columnNames": [
+              "lensId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_kit_lenses_lensId` ON `${TABLE_NAME}` (`lensId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "kits",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "kitId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "lenses",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "lensId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "kit_filters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`kitId` INTEGER NOT NULL, `filterId` INTEGER NOT NULL, PRIMARY KEY(`kitId`, `filterId`), FOREIGN KEY(`kitId`) REFERENCES `kits`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`filterId`) REFERENCES `filters`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "kitId",
+            "columnName": "kitId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterId",
+            "columnName": "filterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "kitId",
+            "filterId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_kit_filters_filterId",
+            "unique": false,
+            "columnNames": [
+              "filterId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_kit_filters_filterId` ON `${TABLE_NAME}` (`filterId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "kits",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "kitId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "filters",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1857082a377b4cf4c0d540291f74ead5')"
+    ]
+  }
+}
