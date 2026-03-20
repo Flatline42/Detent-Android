@@ -4,7 +4,13 @@
       "Bash(./gradlew tasks:*)",
       "mcp__basic-memory__list_memory_projects",
       "mcp__basic-memory__write_note",
-      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew compileDebugKotlin)"
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew compileDebugKotlin)",
+      "Bash(./gradlew compileDebugKotlin)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew compileDebugKotlin --stacktrace)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew :app:kspDebugKotlin --info)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew clean :app:kspDebugKotlin)",
+      "Bash(JAVA_HOME=\"C:/Program Files/Android/Android Studio/jbr\" ./gradlew compileDebugKotlin --info)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

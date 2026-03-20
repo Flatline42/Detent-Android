@@ -156,5 +156,17 @@ abstract class AppDatabase : RoomDatabase() {
                 ).build().also { instance = it }
             }
         }
+
+        /**
+         * Closes and clears the singleton instance.
+         * Must be called before overwriting the database file during a backup restore.
+         * After calling this, the next call to [getInstance] will open a fresh connection.
+         */
+        fun closeInstance() {
+            synchronized(this) {
+                instance?.close()
+                instance = null
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.southsouthwest.framelog.data.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -81,6 +82,14 @@ abstract class RollDao {
      */
     @Query("UPDATE rolls SET lastExportedAt = :timestamp WHERE id = :rollId")
     abstract suspend fun updateLastExported(rollId: Int, timestamp: Long)
+
+    /**
+     * Permanently deletes a roll. Cascades to RollLens, RollFilter, Frame, and FrameFilter
+     * records via the database foreign key constraints. This is irreversible.
+     * Callers must confirm with the user before invoking.
+     */
+    @Delete
+    abstract suspend fun deleteRoll(roll: Roll)
 
     // ---------------------------------------------------------------------------
     // Export
