@@ -7,6 +7,7 @@ import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.AppDatabase
 import com.southsouthwest.framelog.data.db.entity.Roll
 import com.southsouthwest.framelog.data.db.entity.RollStatus
+import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.data.repository.RollRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -34,9 +35,9 @@ enum class RollListTab { ACTIVE, FINISHED, ARCHIVED }
 data class RollListUiState(
     val selectedTab: RollListTab = RollListTab.ACTIVE,
     val searchQuery: String = "",
-    val activeRolls: List<Roll> = emptyList(),
-    val finishedRolls: List<Roll> = emptyList(),
-    val archivedRolls: List<Roll> = emptyList(),
+    val activeRolls: List<RollListRow> = emptyList(),
+    val finishedRolls: List<RollListRow> = emptyList(),
+    val archivedRolls: List<RollListRow> = emptyList(),
     val isLoading: Boolean = true,
 )
 
@@ -81,25 +82,25 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
 
     private fun collectActiveRolls() = viewModelScope.launch {
         searchQuery.debounce(300).flatMapLatest { query ->
-            rollRepository.searchRollsByStatus(query, RollStatus.ACTIVE.value)
-        }.collect { rolls ->
-            _state.update { it.copy(activeRolls = rolls, isLoading = false) }
+            rollRepository.searchRollListRowsByStatus(query, RollStatus.ACTIVE.value)
+        }.collect { rows ->
+            _state.update { it.copy(activeRolls = rows, isLoading = false) }
         }
     }
 
     private fun collectFinishedRolls() = viewModelScope.launch {
         searchQuery.debounce(300).flatMapLatest { query ->
-            rollRepository.searchRollsByStatus(query, RollStatus.FINISHED.value)
-        }.collect { rolls ->
-            _state.update { it.copy(finishedRolls = rolls) }
+            rollRepository.searchRollListRowsByStatus(query, RollStatus.FINISHED.value)
+        }.collect { rows ->
+            _state.update { it.copy(finishedRolls = rows) }
         }
     }
 
     private fun collectArchivedRolls() = viewModelScope.launch {
         searchQuery.debounce(300).flatMapLatest { query ->
-            rollRepository.searchRollsByStatus(query, RollStatus.ARCHIVED.value)
-        }.collect { rolls ->
-            _state.update { it.copy(archivedRolls = rolls) }
+            rollRepository.searchRollListRowsByStatus(query, RollStatus.ARCHIVED.value)
+        }.collect { rows ->
+            _state.update { it.copy(archivedRolls = rows) }
         }
     }
 
@@ -124,14 +125,14 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
         _events.send(RollListEvent.NavigateToRollJournal(rollId))
     }
 
-    fun onLoadRollSwipedOrLongPressed(roll: Roll) = viewModelScope.launch {
+    fun onLoadRollRequested(roll: Roll) = viewModelScope.launch {
         // Show confirmation sheet — actual load happens in onLoadRollConfirmed
         _events.send(RollListEvent.ShowLoadConfirmation(roll))
     }
 
     fun onLoadRollConfirmed(roll: Roll) = viewModelScope.launch {
         rollRepository.updateIsLoaded(roll.id, true)
-        // If no active roll is currently set, make this the active roll
+        // If no active roll is currently set, make this the active roll for the Quick Screen
         if (appPreferences.activeRollId == -1) {
             appPreferences.activeRollId = roll.id
         }
@@ -151,12 +152,19 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
         rollRepository.deleteRoll(roll)
     }
 
-    fun onArchiveTapped(roll: Roll) = viewModelScope.launch {
-        // Archive is a confirmation action — the UI shows a sheet before calling this
+    /**
+     * Archives a finished roll. The UI must show a confirmation dialog before calling this —
+     * archiving is a one-step state transition (archive/unarchive) not a destructive action,
+     * but we still confirm per spec.
+     */
+    fun onArchiveConfirmed(roll: Roll) = viewModelScope.launch {
         rollRepository.archiveRoll(roll.id)
     }
 
-    fun onUnarchiveTapped(roll: Roll) = viewModelScope.launch {
+    /**
+     * Unarchives a roll back to finished status. The UI must confirm before calling this.
+     */
+    fun onUnarchiveConfirmed(roll: Roll) = viewModelScope.launch {
         rollRepository.unarchiveRoll(roll.id)
     }
 }

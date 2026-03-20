@@ -11,6 +11,7 @@ import com.southsouthwest.framelog.data.db.relation.FilterExportRow
 import com.southsouthwest.framelog.data.db.relation.FrameExportRow
 import com.southsouthwest.framelog.data.db.relation.RollExport
 import com.southsouthwest.framelog.data.db.relation.RollExportRow
+import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.data.db.relation.RollWithDetails
 import kotlinx.coroutines.flow.Flow
 
@@ -47,6 +48,26 @@ abstract class RollDao {
 
     @Query("SELECT * FROM rolls WHERE name LIKE '%' || :query || '%' AND status = :status ORDER BY loadedAt DESC")
     abstract fun searchRollsByStatus(query: String, status: String): Flow<List<Roll>>
+
+    /**
+     * Returns rolls for the Roll List screen, enriched with film stock name, camera body name,
+     * and a count of logged frames. Uses a correlated subquery for the frame count to avoid
+     * loading full RollWithDetails (all frames) just to render a list card.
+     */
+    @Query("""
+        SELECT r.id, r.name, r.filmStockId, r.cameraBodyId, r.pushPull, r.ratedISO,
+               r.filmExpiryDate, r.totalExposures, r.isLoaded, r.gpsEnabled, r.status,
+               r.loadedAt, r.finishedAt, r.lastExportedAt, r.notes,
+               fs.name AS filmStockName, fs.make AS filmStockMake,
+               cb.name AS cameraBodyName, cb.make AS cameraBodyMake,
+               (SELECT COUNT(*) FROM frames f WHERE f.rollId = r.id AND f.isLogged = 1) AS loggedFrameCount
+        FROM rolls r
+        JOIN film_stocks fs ON r.filmStockId = fs.id
+        JOIN camera_bodies cb ON r.cameraBodyId = cb.id
+        WHERE r.name LIKE '%' || :query || '%' AND r.status = :status
+        ORDER BY r.loadedAt DESC
+    """)
+    abstract fun searchRollListRowsByStatus(query: String, status: String): Flow<List<RollListRow>>
 
     // ---------------------------------------------------------------------------
     // Writes

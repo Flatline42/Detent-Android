@@ -6,6 +6,7 @@ import com.southsouthwest.framelog.data.db.entity.Roll
 import com.southsouthwest.framelog.data.db.entity.RollFilter
 import com.southsouthwest.framelog.data.db.entity.RollLens
 import com.southsouthwest.framelog.data.db.relation.RollExport
+import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.data.db.relation.RollWithDetails
 import kotlinx.coroutines.flow.Flow
 
@@ -54,6 +55,13 @@ class RollRepository(private val db: AppDatabase) {
     /** Search rolls filtered to a specific status. Used by Roll List tabs. */
     fun searchRollsByStatus(query: String, status: String): Flow<List<Roll>> =
         rollDao.searchRollsByStatus(query, status)
+
+    /**
+     * Returns enriched roll rows for the Roll List screen, including film stock name,
+     * camera body name, and logged frame count. Filtered by status tab.
+     */
+    fun searchRollListRowsByStatus(query: String, status: String): Flow<List<RollListRow>> =
+        rollDao.searchRollListRowsByStatus(query, status)
 
     // ---------------------------------------------------------------------------
     // Writes
