@@ -37,7 +37,7 @@ abstract class RollDao {
      */
     @Transaction
     @Query("SELECT * FROM rolls WHERE id = :rollId")
-    abstract fun getRollById(rollId: Int): Flow<RollWithDetails>
+    abstract fun getRollById(rollId: Int): Flow<RollWithDetails?>
 
     /**
      * Search rolls by name. Optionally filter by status (pass null for all statuses).

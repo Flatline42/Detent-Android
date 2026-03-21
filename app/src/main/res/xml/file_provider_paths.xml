@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!--
+        Backup files are written to context.cacheDir by SettingsViewModel.
+        FileProvider needs this entry to issue content:// URIs for the share sheet.
+    -->
+    <cache-path name="backups" path="." />
+</paths>

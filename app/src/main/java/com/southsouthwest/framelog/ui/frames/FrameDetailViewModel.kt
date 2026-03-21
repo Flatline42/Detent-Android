@@ -114,6 +114,7 @@ class FrameDetailViewModel(
     private suspend fun populateFromFrame(frameWithDetails: FrameWithDetails) {
         val frame = frameWithDetails.frame
         val roll = rollRepository.getRollById(frame.rollId).first()
+            ?: return // Roll deleted while screen was open — bail out
 
         // Build the lens list and shutter speed list from the roll's camera body
         val rollLenses = roll.lenses.map { it.lens }

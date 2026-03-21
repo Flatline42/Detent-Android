@@ -45,7 +45,7 @@ class RollRepository(private val db: AppDatabase) {
      * Returns a specific roll with all its lenses, filters, and frame slots.
      * Used by the Quick Screen (active roll) and Roll Journal.
      */
-    fun getRollById(rollId: Int): Flow<RollWithDetails> =
+    fun getRollById(rollId: Int): Flow<RollWithDetails?> =
         rollDao.getRollById(rollId)
 
     /** Search rolls by name. Used by the Roll List screen. */

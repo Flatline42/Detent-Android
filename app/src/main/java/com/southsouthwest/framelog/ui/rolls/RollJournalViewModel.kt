@@ -88,6 +88,12 @@ class RollJournalViewModel(
     init {
         viewModelScope.launch {
             rollRepository.getRollById(rollId).collect { rollWithDetails ->
+                if (rollWithDetails == null) {
+                    // Roll was deleted from outside this screen (e.g. from Roll List while
+                    // the Journal was open in the back stack). Navigate back immediately.
+                    _events.send(RollJournalEvent.NavigateBack)
+                    return@collect
+                }
                 val currentFrame = appPreferences.getCurrentFrameNumber(rollId)
                 _state.update {
                     it.copy(

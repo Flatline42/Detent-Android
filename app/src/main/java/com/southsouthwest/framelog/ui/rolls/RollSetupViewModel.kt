@@ -17,6 +17,7 @@ import com.southsouthwest.framelog.data.db.entity.RollLens
 import com.southsouthwest.framelog.data.db.entity.RollStatus
 import com.southsouthwest.framelog.data.db.relation.KitWithDetails
 import com.southsouthwest.framelog.data.repository.GearRepository
+import com.southsouthwest.framelog.data.repository.KitRepository
 import com.southsouthwest.framelog.data.repository.RollRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -107,6 +108,7 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val db = AppDatabase.getInstance(application)
     private val gearRepository = GearRepository(db)
+    private val kitRepository = KitRepository(db)
     private val rollRepository = RollRepository(db)
     private val appPreferences = AppPreferences(application)
 
@@ -118,6 +120,19 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
 
     init {
         loadPickerData()
+    }
+
+    /**
+     * Loads a kit by ID and pre-populates the form. Called from [RollSetupScreen] when the
+     * kit selection result is delivered via the navigation back stack SavedStateHandle.
+     *
+     * Note: kit result passing uses NavBackStackEntry.savedStateHandle (the navigation results
+     * handle), which is a different object from the ViewModel's own SavedStateHandle. Observation
+     * must therefore happen in the composable — not in the ViewModel init.
+     */
+    fun loadAndApplyKit(kitId: Int) = viewModelScope.launch {
+        val kit = kitRepository.getKitWithDetails(kitId).first()
+        onKitSelected(kit)
     }
 
     private fun loadPickerData() = viewModelScope.launch {
