@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
@@ -14,9 +17,11 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
@@ -109,10 +114,81 @@ object WidgetState {
 }
 
 // ---------------------------------------------------------------------------
+// Size variants
+// ---------------------------------------------------------------------------
+
+/**
+ * The three supported widget size configurations.
+ *
+ *   STANDARD — 4×2 cells (250×110dp): default placement. Steppers side-by-side.
+ *   COMPACT  — 4×3 cells (250×180dp): taller. Steppers side-by-side, enlarged.
+ *   LOOSE    — 5×3 cells (320×180dp): taller + wider. Steppers stacked full-width.
+ */
+private enum class WidgetSize { STANDARD, COMPACT, LOOSE }
+
+/**
+ * Per-size stepper element dimensions. Passed into the stepper composables so they
+ * don't need to know which variant is active.
+ *
+ * [buttonSize] applies to both width and height of the tap-target button boxes.
+ * [valueWidth] / [valueHeight] size the value display box (ignored in LOOSE — value
+ * uses defaultWeight() to fill available horizontal space instead).
+ * [itemSpacer] is the gap between the button and the value box within one stepper row.
+ * [betweenStepperSpacer] is the gap between aperture and shutter sections (LOOSE only,
+ * ignored in side-by-side variants which use column weights instead).
+ */
+private data class StepperDimensions(
+    val buttonWidth: Dp,  // horizontal tap target; may differ from height in LOOSE
+    val buttonSize: Dp,   // height (and width for STANDARD/COMPACT square buttons)
+    val valueWidth: Dp,
+    val valueHeight: Dp,
+    val labelSp: TextUnit,
+    val buttonSp: TextUnit,
+    val valueSp: TextUnit,
+    val itemSpacer: Dp,
+    val betweenStepperSpacer: Dp,
+    val sectionPaddingVertical: Dp,
+)
+
+private fun dimensionsFor(size: WidgetSize) = when (size) {
+    WidgetSize.STANDARD -> StepperDimensions(
+        buttonWidth = 28.dp, buttonSize = 28.dp, valueWidth = 48.dp, valueHeight = 28.dp,
+        labelSp = 9.sp, buttonSp = 16.sp, valueSp = 15.sp,
+        itemSpacer = 4.dp, betweenStepperSpacer = 0.dp, sectionPaddingVertical = 5.dp,
+    )
+    WidgetSize.COMPACT -> StepperDimensions(
+        buttonWidth = 36.dp, buttonSize = 36.dp, valueWidth = 56.dp, valueHeight = 36.dp,
+        labelSp = 10.sp, buttonSp = 17.sp, valueSp = 17.sp,
+        itemSpacer = 5.dp, betweenStepperSpacer = 0.dp, sectionPaddingVertical = 8.dp,
+    )
+    WidgetSize.LOOSE -> StepperDimensions(
+        buttonWidth = 88.dp, buttonSize = 44.dp, valueWidth = 0.dp, valueHeight = 44.dp,
+        labelSp = 11.sp, buttonSp = 20.sp, valueSp = 20.sp,
+        itemSpacer = 8.dp, betweenStepperSpacer = 10.dp, sectionPaddingVertical = 8.dp,
+    )
+}
+
+// ---------------------------------------------------------------------------
 // GlanceAppWidget
 // ---------------------------------------------------------------------------
 
 class FrameLogWidget : GlanceAppWidget() {
+
+    companion object {
+        // Declared sizes drive SizeMode.Responsive. Glance generates a RemoteViews entry for each
+        // size in the set and the launcher selects the closest fit for the actual widget allocation.
+        // Values use the standard Android cell formula: dp = 70n − 30.
+        private val SIZE_STANDARD = DpSize(250.dp, 110.dp) // 4 wide × 2 tall
+        private val SIZE_COMPACT  = DpSize(250.dp, 180.dp) // 4 wide × 3 tall
+        private val SIZE_LOOSE    = DpSize(320.dp, 180.dp) // 5 wide × 3 tall
+    }
+
+    /**
+     * Responsive mode: Glance renders one RemoteViews per declared size. The launcher
+     * picks whichever fits best in the allocated widget area. Inside the composable,
+     * LocalSize.current reports the size being rendered for that pass.
+     */
+    override val sizeMode = SizeMode.Responsive(setOf(SIZE_STANDARD, SIZE_COMPACT, SIZE_LOOSE))
 
     /**
      * Provides the widget's Compose-like UI. Glance calls this whenever the widget needs
@@ -126,13 +202,20 @@ class FrameLogWidget : GlanceAppWidget() {
      */
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            // GlanceTheme.colors from glance-appwidget provides system-aware dark/light colors.
-            // We don't use the glance-material3 wrapper here to avoid a naming conflict with
-            // androidx.glance.GlanceTheme (both packages use the same class name).
             val state = currentState<Preferences>()
             val hasRoll = state[WidgetState.HAS_ROLL] ?: false
+
+            // Determine which layout variant to render for this pass.
+            val currentSize = LocalSize.current
+            val widgetSize = when {
+                currentSize.width >= SIZE_LOOSE.width &&
+                        currentSize.height >= SIZE_LOOSE.height -> WidgetSize.LOOSE
+                currentSize.height >= SIZE_COMPACT.height -> WidgetSize.COMPACT
+                else -> WidgetSize.STANDARD
+            }
+
             if (hasRoll) {
-                ActiveRollContent(state)
+                ActiveRollContent(state, widgetSize)
             } else {
                 NoRollContent()
             }
@@ -147,16 +230,19 @@ class FrameLogWidget : GlanceAppWidget() {
 /**
  * Main widget layout shown when a roll is loaded and active.
  *
- * Layout mirrors WIREFRAME_widget_2x4.svg:
- *   Row 1 (header): "FilmStock — Camera" | filter count
- *                   "Frame X / Y"
+ * Layout (all variants):
+ *   Header: "FilmStock — Camera" | filter count  +  "Frame X / Y"
  *   Divider
- *   Row 2 (steppers): aperture [− / value / +]  ·  shutter [− / value / +]
+ *   Stepper section (variant-specific — see below)
  *   Divider
- *   Rows 3–4 (log button): full-width tap target
+ *   Log Frame or Roll Complete (fills remaining height)
+ *
+ * Stepper section variants:
+ *   STANDARD / COMPACT — aperture and shutter side-by-side, each occupying half the width.
+ *   LOOSE              — aperture above shutter, each spanning the full width.
  */
 @Composable
-private fun ActiveRollContent(prefs: Preferences) {
+private fun ActiveRollContent(prefs: Preferences, widgetSize: WidgetSize) {
     val filmCamera = prefs[WidgetState.FILM_CAMERA] ?: ""
     val frameNumber = prefs[WidgetState.FRAME_NUMBER] ?: 1
     val totalFrames = prefs[WidgetState.TOTAL_FRAMES] ?: 0
@@ -167,120 +253,54 @@ private fun ActiveRollContent(prefs: Preferences) {
     val isLongExposure = shutter != "—" && ExposureValues.isLongExposure(shutter)
     val isRollComplete = prefs[WidgetState.IS_ROLL_COMPLETE] ?: false
     val rollId = prefs[WidgetState.ROLL_ID] ?: -1
+    val dims = dimensionsFor(widgetSize)
 
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(GlanceTheme.colors.surface),
     ) {
-        // --- Row 1: Header ---
+        // --- Header ---
         Row(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // defaultWeight() is a scope extension on GlanceModifier — no explicit import needed
             Column(modifier = GlanceModifier.defaultWeight()) {
                 Text(
                     text = filmCamera,
-                    style = TextStyle(
-                        fontSize = 11.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                    ),
+                    style = TextStyle(fontSize = 11.sp, color = GlanceTheme.colors.onSurfaceVariant),
                     maxLines = 1,
                 )
                 Text(
                     text = "Frame $frameNumber / $totalFrames",
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                    ),
+                    style = TextStyle(fontSize = 10.sp, color = GlanceTheme.colors.onSurfaceVariant),
                 )
             }
-            // Filter indicator — one bullet per filter (max 4), then +N overflow label
             if (filterCount > 0) {
                 val bullets = "●".repeat(filterCount.coerceAtMost(4))
                 val suffix = if (filterCount > 4) " +${filterCount - 4}" else " filters"
                 Text(
                     text = "$bullets$suffix",
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                    ),
+                    style = TextStyle(fontSize = 10.sp, color = GlanceTheme.colors.onSurfaceVariant),
                 )
             }
         }
 
-        // --- Divider ---
         HorizontalDivider()
 
-        // --- Row 2: Aperture + Shutter steppers ---
-        Row(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .padding(horizontal = 6.dp, vertical = 5.dp),
-        ) {
-            // Aperture stepper (left half)
-            Column(
-                modifier = GlanceModifier.defaultWeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "aperture",
-                    style = TextStyle(
-                        fontSize = 9.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-                Spacer(modifier = GlanceModifier.height(3.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // − = narrower aperture (higher f-number = higher list index)
-                    StepperButton(label = "−", action = actionRunCallback<ApertureDownAction>())
-                    Spacer(modifier = GlanceModifier.width(4.dp))
-                    StepperValue(text = aperture, isLongExposure = false)
-                    Spacer(modifier = GlanceModifier.width(4.dp))
-                    // + = wider aperture (lower f-number = lower list index = more exposure)
-                    StepperButton(label = "+", action = actionRunCallback<ApertureUpAction>())
-                }
-            }
-
-            Spacer(modifier = GlanceModifier.width(4.dp))
-
-            // Shutter stepper (right half)
-            Column(
-                modifier = GlanceModifier.defaultWeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "shutter",
-                    style = TextStyle(
-                        fontSize = 9.sp,
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-                Spacer(modifier = GlanceModifier.height(3.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // − = faster shutter (higher list index = less exposure)
-                    StepperButton(label = "−", action = actionRunCallback<ShutterDownAction>())
-                    Spacer(modifier = GlanceModifier.width(4.dp))
-                    StepperValue(text = shutterDisplay, isLongExposure = isLongExposure)
-                    Spacer(modifier = GlanceModifier.width(4.dp))
-                    // + = slower shutter (lower list index = more exposure)
-                    StepperButton(label = "+", action = actionRunCallback<ShutterUpAction>())
-                }
-            }
+        // --- Stepper section (layout branches on widgetSize) ---
+        if (widgetSize == WidgetSize.LOOSE) {
+            StepperSectionStacked(aperture, shutterDisplay, isLongExposure, dims)
+        } else {
+            StepperSectionSideBySide(aperture, shutterDisplay, isLongExposure, dims)
         }
 
-        // --- Divider ---
         HorizontalDivider()
 
-        // --- Rows 3–4: Log Frame or Roll Complete ---
-        // defaultWeight() is a ColumnScope extension — must be applied inline here.
+        // --- Log Frame or Roll Complete (fills remaining height) ---
         if (isRollComplete) {
-            // Taps to open the app at the Roll Journal so the user can finish the roll.
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("framelog://journal/$rollId"))
             Box(
                 modifier = GlanceModifier
@@ -317,6 +337,176 @@ private fun ActiveRollContent(prefs: Preferences) {
                     ),
                 )
             }
+        }
+    }
+}
+
+/**
+ * Aperture and shutter steppers displayed side-by-side in two equal-weight columns.
+ * Used for STANDARD (2×4) and COMPACT (4×3) variants.
+ */
+@Composable
+private fun StepperSectionSideBySide(
+    aperture: String,
+    shutterDisplay: String,
+    isLongExposure: Boolean,
+    dims: StepperDimensions,
+) {
+    Row(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = dims.sectionPaddingVertical),
+    ) {
+        // Aperture (left column)
+        Column(
+            modifier = GlanceModifier.defaultWeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "aperture",
+                style = TextStyle(
+                    fontSize = dims.labelSp,
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                ),
+            )
+            Spacer(modifier = GlanceModifier.height(3.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // − = narrower (higher f-number = higher list index)
+                StepperButton("−", actionRunCallback<ApertureDownAction>(), dims)
+                Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+                StepperValue(aperture, isLongExposure = false, dims)
+                Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+                // + = wider (lower f-number = lower list index = more exposure)
+                StepperButton("+", actionRunCallback<ApertureUpAction>(), dims)
+            }
+        }
+
+        Spacer(modifier = GlanceModifier.width(4.dp))
+
+        // Shutter (right column)
+        Column(
+            modifier = GlanceModifier.defaultWeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "shutter",
+                style = TextStyle(
+                    fontSize = dims.labelSp,
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                ),
+            )
+            Spacer(modifier = GlanceModifier.height(3.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // − = faster (higher list index = less exposure)
+                StepperButton("−", actionRunCallback<ShutterDownAction>(), dims)
+                Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+                StepperValue(shutterDisplay, isLongExposure, dims)
+                Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+                // + = slower (lower list index = more exposure)
+                StepperButton("+", actionRunCallback<ShutterUpAction>(), dims)
+            }
+        }
+    }
+}
+
+/**
+ * Aperture and shutter steppers stacked vertically, each spanning the full widget width.
+ * Used for the LOOSE (5×3) variant where extra horizontal real estate lets the value
+ * display fill the space between the buttons.
+ */
+@Composable
+private fun StepperSectionStacked(
+    aperture: String,
+    shutterDisplay: String,
+    isLongExposure: Boolean,
+    dims: StepperDimensions,
+) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = dims.sectionPaddingVertical),
+    ) {
+        // Aperture row
+        Text(
+            text = "aperture",
+            modifier = GlanceModifier.fillMaxWidth(),
+            style = TextStyle(
+                fontSize = dims.labelSp,
+                color = GlanceTheme.colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        Spacer(modifier = GlanceModifier.height(3.dp))
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            StepperButton("−", actionRunCallback<ApertureDownAction>(), dims)
+            Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+            // defaultWeight() is a RowScope extension — must be inlined here, not extracted.
+            Box(
+                modifier = GlanceModifier
+                    .defaultWeight()
+                    .height(dims.valueHeight)
+                    .background(GlanceTheme.colors.surface),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = aperture,
+                    style = TextStyle(
+                        fontSize = dims.valueSp,
+                        fontWeight = FontWeight.Medium,
+                        color = GlanceTheme.colors.onSurface,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+            Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+            StepperButton("+", actionRunCallback<ApertureUpAction>(), dims)
+        }
+
+        Spacer(modifier = GlanceModifier.height(dims.betweenStepperSpacer))
+
+        // Shutter row
+        Text(
+            text = "shutter",
+            modifier = GlanceModifier.fillMaxWidth(),
+            style = TextStyle(
+                fontSize = dims.labelSp,
+                color = GlanceTheme.colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        Spacer(modifier = GlanceModifier.height(3.dp))
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            StepperButton("−", actionRunCallback<ShutterDownAction>(), dims)
+            Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+            // defaultWeight() is a RowScope extension — must be inlined here, not extracted.
+            Box(
+                modifier = GlanceModifier
+                    .defaultWeight()
+                    .height(dims.valueHeight)
+                    .background(GlanceTheme.colors.surface),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = shutterDisplay,
+                    style = TextStyle(
+                        fontSize = dims.valueSp,
+                        fontWeight = FontWeight.Medium,
+                        color = if (isLongExposure) GlanceTheme.colors.error
+                                else GlanceTheme.colors.onSurface,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+            Spacer(modifier = GlanceModifier.width(dims.itemSpacer))
+            StepperButton("+", actionRunCallback<ShutterUpAction>(), dims)
         }
     }
 }
@@ -366,16 +556,17 @@ private fun NoRollContent() {
 // ---------------------------------------------------------------------------
 
 /**
- * Tappable stepper button (− or +). Uses surfaceVariant background to visually distinguish
- * it from the value display box. 28×28dp gives a usable tap target on a widget.
+ * Tappable stepper button (− or +). Size is driven by [dims] so the same composable
+ * scales across all widget size variants.
  *
  * Corner radius (6dp) is applied on API 31+ only — silently ignored on API 26-30.
  */
 @Composable
-private fun StepperButton(label: String, action: Action) {
+private fun StepperButton(label: String, action: Action, dims: StepperDimensions) {
     Box(
         modifier = GlanceModifier
-            .size(28.dp)
+            .width(dims.buttonWidth)
+            .height(dims.buttonSize)
             .background(GlanceTheme.colors.surfaceVariant)
             .cornerRadius(6.dp)
             .clickable(action),
@@ -384,7 +575,7 @@ private fun StepperButton(label: String, action: Action) {
         Text(
             text = label,
             style = TextStyle(
-                fontSize = 16.sp,
+                fontSize = dims.buttonSp,
                 fontWeight = FontWeight.Medium,
                 color = GlanceTheme.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -394,26 +585,26 @@ private fun StepperButton(label: String, action: Action) {
 }
 
 /**
- * Read-only value display between the stepper buttons.
+ * Fixed-width value display for STANDARD and COMPACT variants (side-by-side layout).
+ * Width and height are taken from [dims].
  *
- * Long-exposure shutter values (whole seconds and B) render in the error color,
- * matching the camera dial convention (red numbers on film cameras like the Canon AE-1)
- * and consistent with the Quick Screen stepper behavior.
+ * Long-exposure shutter values render in the error color, matching the camera dial
+ * convention (red numbers) and the Quick Screen stepper behavior.
  */
 @Composable
-private fun StepperValue(text: String, isLongExposure: Boolean) {
+private fun StepperValue(text: String, isLongExposure: Boolean, dims: StepperDimensions) {
     val color = if (isLongExposure) GlanceTheme.colors.error else GlanceTheme.colors.onSurface
     Box(
         modifier = GlanceModifier
-            .width(48.dp)
-            .height(28.dp)
+            .width(dims.valueWidth)
+            .height(dims.valueHeight)
             .background(GlanceTheme.colors.surface),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             style = TextStyle(
-                fontSize = 15.sp,
+                fontSize = dims.valueSp,
                 fontWeight = FontWeight.Medium,
                 color = color,
                 textAlign = TextAlign.Center,

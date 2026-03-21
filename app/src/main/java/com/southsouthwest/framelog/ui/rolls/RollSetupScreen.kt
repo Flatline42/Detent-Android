@@ -254,16 +254,33 @@ fun RollSetupScreen(navController: NavHostController) {
                 }
             }
 
-            // Film expiry date (optional)
+            // Film expiry date — single tappable row (no label above, saves vertical space)
             val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
-            PickerRow(
-                label = "Film expiry date",
-                value = state.filmExpiryDate
-                    ?.let { dateFormatter.format(Date(it)) }
-                    ?: "Optional",
-                placeholder = state.filmExpiryDate == null,
-                onClick = { showDatePicker = true },
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDatePicker = true }
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = state.filmExpiryDate
+                        ?.let { "Expiry date: ${dateFormatter.format(Date(it))}" }
+                        ?: "Set expiry date (optional)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (state.filmExpiryDate == null)
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    else
+                        MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 

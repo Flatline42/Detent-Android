@@ -267,6 +267,38 @@ fun QuickScreenScreen(navController: NavHostController) {
                             modifier = Modifier.fillMaxWidth(),
                         )
 
+                        // Off-frontier indicator — shown when the user has manually navigated
+                        // away from the next expected unlogged frame.
+                        val frontier = state.frontierFrameNumber
+                        // isAtFrontier is true when roll is complete (frontier == null) or pointer
+                        // is already on the next expected unlogged frame.
+                        val isAtFrontier = frontier == null || state.currentFrameNumber == frontier
+                        if (!isAtFrontier) {
+                            // Smart-cast: !isAtFrontier implies frontier != null
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "not at current frame",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(
+                                    onClick = { viewModel.onFramePointerChanged(frontier) },
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                ) {
+                                    Text(
+                                        text = "← return to $frontier",
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
+                            }
+                        }
+
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                         // Lens selector

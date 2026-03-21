@@ -40,6 +40,13 @@ data class QuickScreenUiState(
     val currentFrameNumber: Int = 1,
     /** The actual Frame entity at currentFrameNumber, or null if out of range. */
     val currentFrame: Frame? = null,
+    /**
+     * The "frontier" frame number — first unlogged frame after the highest logged frame,
+     * or frame 1 when nothing has been logged yet. Null when the roll is complete.
+     * Used by the UI to show an off-frontier indicator when the user has manually
+     * navigated away from the expected next frame.
+     */
+    val frontierFrameNumber: Int? = null,
 
     // ---------------------------------------------------------------------------
     // Editable draft fields — pre-populated from the most recently logged frame
@@ -145,6 +152,21 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     /**
+     * Returns the frontier frame number for [frames]: the first unlogged frame after the
+     * highest logged frame, or frame 1 when nothing is logged. Returns null when the roll
+     * is complete (no unlogged frames remain after the highest logged frame).
+     */
+    private fun computeFrontierFrameNumber(frames: List<Frame>): Int? {
+        val highestLoggedFrameNumber = frames.filter { it.isLogged }.maxOfOrNull { it.frameNumber }
+        return if (highestLoggedFrameNumber != null) {
+            frames.filter { it.frameNumber > highestLoggedFrameNumber && !it.isLogged }
+                .minByOrNull { it.frameNumber }?.frameNumber
+        } else {
+            frames.minByOrNull { it.frameNumber }?.frameNumber
+        }
+    }
+
+    /**
      * Pre-populates the draft fields from the most recently logged frame.
      * Called on initial load and when the active roll changes.
      */
@@ -201,6 +223,7 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
                 note = "", // Note does not carry forward between frames
                 availableShutterSpeeds = shutterSpeeds,
                 availableApertures = apertures,
+                frontierFrameNumber = computeFrontierFrameNumber(roll.frames),
             )
         }
     }
@@ -391,6 +414,9 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
                     it.copy(
                         currentFrameNumber = nextFrame.frameNumber,
                         currentFrame = nextFrame,
+                        // nextFrame IS the new frontier — optimistic update avoids a flash of the
+                        // off-frontier indicator before the Room Flow re-emits the updated roll.
+                        frontierFrameNumber = nextFrame.frameNumber,
                         note = "", // clear the note field for the next frame
                     )
                 }
