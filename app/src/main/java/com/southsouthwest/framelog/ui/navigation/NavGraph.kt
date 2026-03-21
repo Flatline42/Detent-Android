@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navDeepLink
 import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.ui.frames.FrameDetailScreen
 import com.southsouthwest.framelog.ui.gear.CameraBodyDetailScreen
@@ -126,7 +127,9 @@ fun FrameLogNavGraph(navController: NavHostController) {
                     RollListScreen(navController = navController)
                 }
 
-                composable<RollJournal> {
+                composable<RollJournal>(
+                    deepLinks = listOf(navDeepLink { uriPattern = "framelog://journal/{rollId}" }),
+                ) {
                     RollJournalScreen(navController = navController)
                 }
 

@@ -64,10 +64,27 @@ object FrameLogWidgetUpdater {
         val filmStock = db.filmStockDao().getFilmStockById(rollWithDetails.roll.filmStockId).first()
         val cameraBody = db.cameraBodyDao().getCameraBodyById(rollWithDetails.roll.cameraBodyId).first()
 
-        // Current frame pointer — clamped to a valid frame range
         val totalFrames = rollWithDetails.frames.size
-        val frameNumber = appPrefs.getCurrentFrameNumber(rollId)
-            .coerceIn(1, if (totalFrames > 0) totalFrames else 1)
+
+        // Derive widget frame pointer from Room — independent of the Quick Screen's
+        // SharedPreferences pointer. The widget always targets the first unlogged frame
+        // after the highest logged frame number. If no frames have been logged yet,
+        // defaults to frame 1. If no unlogged frames remain after the highest logged,
+        // the roll is complete.
+        val highestLoggedFrame = rollWithDetails.frames
+            .filter { it.isLogged }
+            .maxByOrNull { it.frameNumber }
+
+        val targetFrame = if (highestLoggedFrame == null) {
+            rollWithDetails.frames.minByOrNull { it.frameNumber }
+        } else {
+            rollWithDetails.frames
+                .filter { !it.isLogged && it.frameNumber > highestLoggedFrame.frameNumber }
+                .minByOrNull { it.frameNumber }
+        }
+
+        val isRollComplete = targetFrame == null
+        val frameNumber = targetFrame?.frameNumber ?: totalFrames
 
         // Build stepper value lists from the camera body and primary lens
         val shutterList = ExposureValues.shutterSpeeds(cameraBody.shutterIncrements)
@@ -77,11 +94,9 @@ object FrameLogWidgetUpdater {
             ExposureValues.apertures(it.maxAperture, it.minAperture, it.apertureIncrements)
         } ?: emptyList()
 
-        // Pre-populate aperture/shutter from the most recently logged frame at or before
-        // the current pointer. Falls back to the midpoint of the list when no frame exists yet.
-        val lastLogged = rollWithDetails.frames
-            .filter { it.isLogged && it.frameNumber <= frameNumber }
-            .maxByOrNull { it.frameNumber }
+        // Pre-populate exposure values from the highest logged frame.
+        // Falls back to the midpoint of each list when no frames have been logged yet.
+        val lastLogged = highestLoggedFrame
 
         val currentAperture = lastLogged?.aperture
             ?: apertureList.getOrNull(apertureList.size / 2)
@@ -121,6 +136,7 @@ object FrameLogWidgetUpdater {
                 prefs[WidgetState.SHUTTER_LIST] = shutterList.joinToString(",")
                 prefs[WidgetState.LENS_ID] = currentLensId
                 prefs[WidgetState.FILTER_IDS] = currentFilterIds.joinToString(",")
+                prefs[WidgetState.IS_ROLL_COMPLETE] = isRollComplete
             }
             FrameLogWidget().update(context, glanceId)
         }

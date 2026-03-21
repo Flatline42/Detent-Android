@@ -8,7 +8,6 @@ import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.action.ActionParameters
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.AppDatabase
 import com.southsouthwest.framelog.data.db.entity.Frame
 import com.southsouthwest.framelog.data.db.entity.FrameFilter
@@ -167,7 +166,6 @@ class LogFrameAction : ActionCallback {
             .map { it.toInt() }.toSet()
 
         val db = AppDatabase.getInstance(context)
-        val appPrefs = AppPreferences(context)
         val frameRepository = FrameRepository(db)
 
         // Load the roll to find the target frame entity by frameNumber
@@ -205,19 +203,8 @@ class LogFrameAction : ActionCallback {
 
         frameRepository.logFrame(updatedFrame, filtersToAdd, filterIdsToRemove)
 
-        // Advance the frame pointer to the next unlogged frame after the one just logged.
-        // We use the pre-write rollWithDetails.frames because frames before frameNumber that
-        // were already unlogged remain unlogged — we only want frames AFTER the current one.
-        val nextUnlogged = rollWithDetails.frames
-            .filter { it.frameNumber > frameNumber && !it.isLogged }
-            .minByOrNull { it.frameNumber }
-
-        if (nextUnlogged != null) {
-            appPrefs.setCurrentFrameNumber(rollId, nextUnlogged.frameNumber)
-        }
-
-        // Full widget refresh — re-reads from Room to pick up the updated frame state
-        // and the new frame pointer position.
+        // Full widget refresh — re-derives the frame pointer from Room (first unlogged frame
+        // after the highest logged frame number, or roll complete state).
         FrameLogWidgetUpdater.update(context)
     }
 }

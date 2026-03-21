@@ -2,6 +2,7 @@ package com.southsouthwest.framelog.ui.widget
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,6 +100,12 @@ object WidgetState {
      * Empty string when no filters were active. Read by LogFrameAction to carry filters forward.
      */
     val FILTER_IDS = stringPreferencesKey("w_filter_ids")
+
+    /**
+     * True when there are no unlogged frames after the highest logged frame number.
+     * ActiveRollContent shows "Roll Complete" instead of the log button in this state.
+     */
+    val IS_ROLL_COMPLETE = booleanPreferencesKey("w_is_roll_complete")
 }
 
 // ---------------------------------------------------------------------------
@@ -158,6 +165,8 @@ private fun ActiveRollContent(prefs: Preferences) {
     val shutter = prefs[WidgetState.SHUTTER] ?: "—"
     val shutterDisplay = if (shutter != "—") ExposureValues.shutterDisplayValue(shutter) else "—"
     val isLongExposure = shutter != "—" && ExposureValues.isLongExposure(shutter)
+    val isRollComplete = prefs[WidgetState.IS_ROLL_COMPLETE] ?: false
+    val rollId = prefs[WidgetState.ROLL_ID] ?: -1
 
     Column(
         modifier = GlanceModifier
@@ -268,25 +277,46 @@ private fun ActiveRollContent(prefs: Preferences) {
         // --- Divider ---
         HorizontalDivider()
 
-        // --- Rows 3–4: Log Frame button ---
-        // Note: the widget cannot show confirmation dialogs. If a frame was previously logged,
-        // this silently overwrites it. The user can correct via the Frame Detail screen.
-        Box(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .defaultWeight()
-                .clickable(actionRunCallback<LogFrameAction>()),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "log frame",
-                style = TextStyle(
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = GlanceTheme.colors.onSurface,
-                    textAlign = TextAlign.Center,
-                ),
-            )
+        // --- Rows 3–4: Log Frame or Roll Complete ---
+        // defaultWeight() is a ColumnScope extension — must be applied inline here.
+        if (isRollComplete) {
+            // Taps to open the app at the Roll Journal so the user can finish the roll.
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("framelog://journal/$rollId"))
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .defaultWeight()
+                    .clickable(actionStartActivity(intent)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "roll complete →",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = GlanceTheme.colors.primary,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+        } else {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .defaultWeight()
+                    .clickable(actionRunCallback<LogFrameAction>()),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "log frame",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = GlanceTheme.colors.onSurface,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
         }
     }
 }
