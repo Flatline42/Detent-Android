@@ -2,8 +2,11 @@ package com.southsouthwest.framelog.ui.quickscreen
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,9 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -91,7 +92,6 @@ fun QuickScreenScreen(navController: NavHostController) {
     val viewModel: QuickScreenViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -130,7 +130,7 @@ fun QuickScreenScreen(navController: NavHostController) {
         viewModel.events.collect { event ->
             when (event) {
                 is QuickScreenEvent.FrameLogged -> {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    vibrateConfirm(context)
                 }
                 is QuickScreenEvent.ConfirmOverwrite -> {
                     overwriteFrameNumber = event.frameNumber
@@ -252,6 +252,23 @@ fun QuickScreenScreen(navController: NavHostController) {
                             .verticalScroll(rememberScrollState())
                             .padding(vertical = 8.dp),
                     ) {
+                        // Frame pointer stepper
+                        SmallStepper(
+                            label = "frame pointer",
+                            displayText = "${state.currentFrameNumber} / ${activeRoll.frames.size}",
+                            canDecrement = state.currentFrameNumber > 1,
+                            canIncrement = true, // advancing past last emits RollComplete
+                            onDecrement = {
+                                viewModel.onFramePointerChanged(state.currentFrameNumber - 1)
+                            },
+                            onIncrement = {
+                                viewModel.onFramePointerChanged(state.currentFrameNumber + 1)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
                         // Lens selector
                         val selectedLens = rollLenses
                             .firstOrNull { it.lens.id == state.selectedLensId }?.lens
@@ -301,23 +318,6 @@ fun QuickScreenScreen(navController: NavHostController) {
                             onValueTapped = if (ec != null) {
                                 { viewModel.onExposureCompensationChanged(null) }
                             } else null,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        // Frame pointer stepper
-                        SmallStepper(
-                            label = "frame pointer",
-                            displayText = "${state.currentFrameNumber} / ${activeRoll.frames.size}",
-                            canDecrement = state.currentFrameNumber > 1,
-                            canIncrement = true, // advancing past last emits RollComplete
-                            onDecrement = {
-                                viewModel.onFramePointerChanged(state.currentFrameNumber - 1)
-                            },
-                            onIncrement = {
-                                viewModel.onFramePointerChanged(state.currentFrameNumber + 1)
-                            },
                             modifier = Modifier.fillMaxWidth(),
                         )
 
@@ -821,6 +821,7 @@ private fun SmallStepper(
     /** Optional: tapping the value display triggers this callback (e.g. clear EC). */
     onValueTapped: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -836,7 +837,7 @@ private fun SmallStepper(
             horizontalArrangement = Arrangement.Center,
         ) {
             OutlinedButton(
-                onClick = onDecrement,
+                onClick = { vibrateDecrement(context); onDecrement() },
                 enabled = canDecrement,
                 modifier = Modifier.size(width = 42.dp, height = 36.dp),
                 contentPadding = PaddingValues(0.dp),
@@ -865,7 +866,7 @@ private fun SmallStepper(
             }
             Spacer(Modifier.width(8.dp))
             OutlinedButton(
-                onClick = onIncrement,
+                onClick = { vibrateIncrement(context); onIncrement() },
                 enabled = canIncrement,
                 modifier = Modifier.size(width = 42.dp, height = 36.dp),
                 contentPadding = PaddingValues(0.dp),
@@ -892,6 +893,7 @@ private fun LargeStepper(
     modifier: Modifier = Modifier,
     displayColor: Color = Color.Unspecified,
 ) {
+    val context = LocalContext.current
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -907,7 +909,7 @@ private fun LargeStepper(
             horizontalArrangement = Arrangement.Center,
         ) {
             OutlinedButton(
-                onClick = onDecrement,
+                onClick = { vibrateDecrement(context); onDecrement() },
                 enabled = canDecrement,
                 modifier = Modifier.size(52.dp),
                 contentPadding = PaddingValues(0.dp),
@@ -930,7 +932,7 @@ private fun LargeStepper(
             }
             Spacer(Modifier.width(8.dp))
             OutlinedButton(
-                onClick = onIncrement,
+                onClick = { vibrateIncrement(context); onIncrement() },
                 enabled = canIncrement,
                 modifier = Modifier.size(52.dp),
                 contentPadding = PaddingValues(0.dp),
@@ -1023,4 +1025,29 @@ private fun formatLastShot(loggedAt: Long?): String {
         diffDays < 7 -> "$diffDays days ago"
         else -> "${diffDays / 7} week${if (diffDays / 7 > 1) "s" else ""} ago"
     }
+}
+
+// ---------------------------------------------------------------------------
+// Haptic helpers — direct Vibrator bypasses accessibility suppression
+// ---------------------------------------------------------------------------
+
+/** Single firm pulse — stepper increment (+). */
+private fun vibrateIncrement(context: Context) {
+    context.getSystemService(Vibrator::class.java)
+        ?.takeIf { it.hasVibrator() }
+        ?.vibrate(VibrationEffect.createOneShot(50, 80))
+}
+
+/** Double short pulse — stepper decrement (−). */
+private fun vibrateDecrement(context: Context) {
+    context.getSystemService(Vibrator::class.java)
+        ?.takeIf { it.hasVibrator() }
+        ?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 30, 50, 30), intArrayOf(0, 80, 0, 80), -1))
+}
+
+/** Longer firm pulse — successful frame log confirmation. */
+private fun vibrateConfirm(context: Context) {
+    context.getSystemService(Vibrator::class.java)
+        ?.takeIf { it.hasVibrator() }
+        ?.vibrate(VibrationEffect.createOneShot(120, 200))
 }

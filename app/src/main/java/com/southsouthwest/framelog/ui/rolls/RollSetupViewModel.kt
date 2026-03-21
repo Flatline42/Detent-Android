@@ -98,6 +98,8 @@ sealed class RollSetupEvent {
     data class RollCreatedAndLoaded(val rollId: Int) : RollSetupEvent()
     /** Navigate to Kit Selector screen; returns [KitWithDetails] on success. */
     data object NavigateToKitSelector : RollSetupEvent()
+    /** User tried to enable GPS on this roll while GPS capture is disabled globally in Settings. */
+    data object GpsDisabledInSettings : RollSetupEvent()
     data class ShowErrorMessage(val message: String) : RollSetupEvent()
 }
 
@@ -113,7 +115,10 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
     private val rollRepository = RollRepository(db)
     private val appPreferences = AppPreferences(application)
 
-    private val _state = MutableStateFlow(RollSetupUiState())
+    private val _state = MutableStateFlow(
+        // Default GPS to the global setting so per-roll GPS tracks the user's preference.
+        RollSetupUiState(gpsEnabled = appPreferences.gpsCaptureEnabled)
+    )
     val state: StateFlow<RollSetupUiState> = _state.asStateFlow()
 
     private val _events = Channel<RollSetupEvent>(Channel.BUFFERED)
@@ -359,6 +364,11 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
     // ---------------------------------------------------------------------------
 
     fun onGpsEnabledChanged(enabled: Boolean) {
+        if (enabled && !appPreferences.gpsCaptureEnabled) {
+            // Global GPS is off — inform the user instead of enabling silently.
+            viewModelScope.launch { _events.send(RollSetupEvent.GpsDisabledInSettings) }
+            return
+        }
         _state.update { it.copy(gpsEnabled = enabled) }
     }
 

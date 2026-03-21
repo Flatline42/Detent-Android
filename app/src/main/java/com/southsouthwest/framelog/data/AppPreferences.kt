@@ -9,7 +9,7 @@ private const val PREFS_NAME = "framelog_prefs"
 private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
 private const val KEY_ACTIVE_ROLL_ID = "active_roll_id"
 private const val KEY_EXTRA_FRAMES_PER_ROLL = "extra_frames_per_roll"
-private const val KEY_GPS_PRECISION = "gps_precision"
+private const val KEY_GPS_CAPTURE_ENABLED = "gps_capture_enabled"
 private const val KEY_DEFAULT_EXPORT_FORMAT = "default_export_format"
 private const val KEY_APP_THEME = "app_theme"
 private const val KEY_ACCESSIBLE_COLOR_MODE = "accessible_color_mode"
@@ -74,9 +74,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt(KEY_EXTRA_FRAMES_PER_ROLL, 2)
         set(value) = prefs.edit { putInt(KEY_EXTRA_FRAMES_PER_ROLL, value) }
 
-    var gpsPrecision: GpsPrecision
-        get() = GpsPrecision.fromKey(prefs.getString(KEY_GPS_PRECISION, GpsPrecision.HIGH.key)!!)
-        set(value) = prefs.edit { putString(KEY_GPS_PRECISION, value.key) }
+    /** Whether GPS location capture is enabled globally. When true, rolls can use GPS capture. */
+    var gpsCaptureEnabled: Boolean
+        get() = prefs.getBoolean(KEY_GPS_CAPTURE_ENABLED, false)
+        set(value) = prefs.edit { putBoolean(KEY_GPS_CAPTURE_ENABLED, value) }
 
     var defaultExportFormat: ExportFormat
         get() = ExportFormat.fromKey(
@@ -169,15 +170,6 @@ class AppPreferences(context: Context) {
 // ---------------------------------------------------------------------------
 // Preference enums
 // ---------------------------------------------------------------------------
-
-enum class GpsPrecision(val key: String) {
-    HIGH("high"),
-    BATTERY_SAVER("battery_saver");
-
-    companion object {
-        fun fromKey(key: String) = entries.firstOrNull { it.key == key } ?: HIGH
-    }
-}
 
 enum class ExportFormat(val key: String) {
     CSV("csv"),

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.data.ExportFormat
-import com.southsouthwest.framelog.data.GpsPrecision
 import com.southsouthwest.framelog.data.db.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +27,7 @@ import java.io.File
 data class SettingsUiState(
     // Shooting defaults
     val extraFramesPerRoll: Int = 2,
-    val gpsPrecision: GpsPrecision = GpsPrecision.HIGH,
+    val gpsCaptureEnabled: Boolean = false,
     val defaultExportFormat: ExportFormat = ExportFormat.CSV,
     // Appearance
     val appTheme: AppTheme = AppTheme.SYSTEM,
@@ -77,7 +76,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val _state = MutableStateFlow(
         SettingsUiState(
             extraFramesPerRoll = appPreferences.extraFramesPerRoll,
-            gpsPrecision = appPreferences.gpsPrecision,
+            gpsCaptureEnabled = appPreferences.gpsCaptureEnabled,
             defaultExportFormat = appPreferences.defaultExportFormat,
             appTheme = appPreferences.appTheme,
             accessibleColorMode = appPreferences.accessibleColorMode,
@@ -98,9 +97,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         _state.update { it.copy(extraFramesPerRoll = clamped) }
     }
 
-    fun onGpsPrecisionChanged(precision: GpsPrecision) {
-        appPreferences.gpsPrecision = precision
-        _state.update { it.copy(gpsPrecision = precision) }
+    fun onGpsCaptureEnabledChanged(enabled: Boolean) {
+        appPreferences.gpsCaptureEnabled = enabled
+        _state.update { it.copy(gpsCaptureEnabled = enabled) }
     }
 
     fun onDefaultExportFormatChanged(format: ExportFormat) {

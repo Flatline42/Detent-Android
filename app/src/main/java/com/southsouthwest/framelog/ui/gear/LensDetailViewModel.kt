@@ -35,7 +35,7 @@ data class LensDetailUiState(
     val mountType: String = "",
     val maxAperture: String = "", // "f/" prefix stripped in the input field
     val minAperture: String = "",
-    val apertureIncrements: ApertureIncrements = ApertureIncrements.THIRD,
+    val apertureIncrements: ApertureIncrements = ApertureIncrements.HALF,
     val filterSizeMm: String = "", // blank = null in DB
     val notes: String = "",
     // Autocomplete suggestions for the folksonomy mount type field

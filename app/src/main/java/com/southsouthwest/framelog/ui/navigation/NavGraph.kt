@@ -207,7 +207,8 @@ private fun FrameLogNavigationBar(
                 navController.navigate(RollList) {
                     popUpTo<QuickScreen> { saveState = true }
                     launchSingleTop = true
-                    restoreState = true
+                    // No restoreState: always land on RollList itself, not a saved sub-stack
+                    // that may include RollJournal stacked on top (navigated there via card tap).
                 }
             },
         )

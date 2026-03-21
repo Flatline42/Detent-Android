@@ -194,8 +194,9 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
                 selectedLensId = preDraftLensId,
                 activeFilterIds = lastFrameFilters.filter { id -> id in rollFilterIds }.toSet(),
                 mruFilterIds = mruIds,
-                aperture = lastLoggedFrame?.aperture,
-                shutterSpeed = lastLoggedFrame?.shutterSpeed,
+                // When no previous frame exists (first frame on roll), default to common field settings.
+                aperture = lastLoggedFrame?.aperture ?: apertures.firstOrNull { it == "f/5.6" },
+                shutterSpeed = lastLoggedFrame?.shutterSpeed ?: shutterSpeeds.firstOrNull { it == "1/125" },
                 exposureCompensation = lastLoggedFrame?.exposureCompensation,
                 note = "", // Note does not carry forward between frames
                 availableShutterSpeeds = shutterSpeeds,

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -91,6 +93,7 @@ fun RollSetupScreen(navController: NavHostController) {
     var showBodyPicker by remember { mutableStateOf(false) }
     var showLensPicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showGpsDisabledDialog by remember { mutableStateOf(false) }
     // Custom ISO row is collapsed by default
     var showCustomIso by remember { mutableStateOf(false) }
 
@@ -101,6 +104,8 @@ fun RollSetupScreen(navController: NavHostController) {
             when (event) {
                 is RollSetupEvent.NavigateToKitSelector ->
                     navController.navigate(KitSelector)
+                is RollSetupEvent.GpsDisabledInSettings ->
+                    showGpsDisabledDialog = true
                 is RollSetupEvent.RollCreated ->
                     navController.navigate(RollJournal(event.rollId)) {
                         popUpTo<RollSetup> { inclusive = true }
@@ -152,6 +157,7 @@ fun RollSetupScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
         ) {
 
@@ -208,6 +214,45 @@ fun RollSetupScreen(navController: NavHostController) {
                 },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             )
+
+            // Custom ISO — expand/collapse link, directly below push/pull
+            Text(
+                text = if (showCustomIso) "use push/pull instead" else "set custom ISO instead of push/pull",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    textDecoration = TextDecoration.Underline,
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .clickable {
+                        showCustomIso = !showCustomIso
+                        if (!showCustomIso) {
+                            // Switching back to push/pull: restore pushPull = 0 if it was custom
+                            if (state.pushPull == null) {
+                                viewModel.onPushPullChanged(0)
+                            }
+                        }
+                    },
+            )
+
+            if (showCustomIso) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                    FieldLabel("Rated ISO")
+                    OutlinedTextField(
+                        value = state.customRatedIsoText,
+                        onValueChange = viewModel::onCustomRatedIsoChanged,
+                        modifier = Modifier.width(120.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        placeholder = {
+                            Text(
+                                text = state.ratedISO.toString(),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                    )
+                }
+            }
 
             // Film expiry date (optional)
             val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
@@ -405,51 +450,6 @@ fun RollSetupScreen(navController: NavHostController) {
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             // ==================================================================
-            // Custom ISO — collapsed by default
-            // ==================================================================
-
-            // Expand/collapse link
-            Text(
-                text = if (showCustomIso) "use push/pull instead" else "set custom ISO instead of push/pull",
-                style = MaterialTheme.typography.bodySmall.copy(
-                    textDecoration = TextDecoration.Underline,
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .clickable {
-                        showCustomIso = !showCustomIso
-                        if (!showCustomIso) {
-                            // Switching back to push/pull: restore push/pull = 0 if it was custom
-                            if (state.pushPull == null) {
-                                viewModel.onPushPullChanged(0)
-                            }
-                        }
-                    },
-            )
-
-            if (showCustomIso) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
-                    FieldLabel("Rated ISO")
-                    OutlinedTextField(
-                        value = state.customRatedIsoText,
-                        onValueChange = viewModel::onCustomRatedIsoChanged,
-                        modifier = Modifier.width(120.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        placeholder = {
-                            Text(
-                                text = state.ratedISO.toString(),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        },
-                    )
-                }
-            }
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-            // ==================================================================
             // Action buttons
             // ==================================================================
 
@@ -478,6 +478,21 @@ fun RollSetupScreen(navController: NavHostController) {
             // Bottom breathing room for the scroll area
             Spacer(Modifier.height(16.dp))
         }
+    }
+
+    // ==========================================================================
+    // GPS disabled dialog
+    // ==========================================================================
+
+    if (showGpsDisabledDialog) {
+        AlertDialog(
+            onDismissRequest = { showGpsDisabledDialog = false },
+            title = { Text("GPS not enabled") },
+            text = { Text("GPS capture is turned off globally. Enable it in Settings \u203a Shooting Defaults first.") },
+            confirmButton = {
+                TextButton(onClick = { showGpsDisabledDialog = false }) { Text("OK") }
+            },
+        )
     }
 
     // ==========================================================================

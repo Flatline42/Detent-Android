@@ -1,6 +1,8 @@
 package com.southsouthwest.framelog.ui.rolls
 
 import android.content.Intent
+import androidx.core.content.FileProvider
+import java.io.File
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -130,10 +132,28 @@ fun RollJournalScreen(navController: NavHostController) {
                 is RollJournalEvent.ShowDeleteConfirmation ->
                     showDeleteDialog = true
                 is RollJournalEvent.ShareExportContent -> {
-                    val intent = Intent(Intent.ACTION_SEND).apply {
-                        type = event.mimeType
-                        putExtra(Intent.EXTRA_TEXT, event.content)
-                        putExtra(Intent.EXTRA_SUBJECT, event.suggestedFilename)
+                    val intent = if (event.mimeType == "text/csv") {
+                        // Write CSV to cache so it can be shared as a file attachment
+                        // via FileProvider (same authority used for database backup export).
+                        val file = File(context.cacheDir, event.suggestedFilename)
+                        file.writeText(event.content)
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.fileprovider",
+                            file,
+                        )
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/csv"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            putExtra(Intent.EXTRA_SUBJECT, event.suggestedFilename)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                    } else {
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = event.mimeType
+                            putExtra(Intent.EXTRA_TEXT, event.content)
+                            putExtra(Intent.EXTRA_SUBJECT, event.suggestedFilename)
+                        }
                     }
                     context.startActivity(Intent.createChooser(intent, null))
                 }
@@ -289,14 +309,14 @@ fun RollJournalScreen(navController: NavHostController) {
                                 onDismissRequest = { showSortMenu = false },
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Frame: 1 \u2192 N") },
+                                    text = { Text("Frame: 1 \u2192 $totalExposures") },
                                     onClick = {
                                         frameSort = FrameSort.ASCENDING
                                         showSortMenu = false
                                     },
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Frame: N \u2192 1") },
+                                    text = { Text("Frame: $totalExposures \u2192 1") },
                                     onClick = {
                                         frameSort = FrameSort.DESCENDING
                                         showSortMenu = false

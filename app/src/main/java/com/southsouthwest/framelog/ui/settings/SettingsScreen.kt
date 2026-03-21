@@ -53,7 +53,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.data.ExportFormat
-import com.southsouthwest.framelog.data.GpsPrecision
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,12 +67,6 @@ private const val PRIVACY_POLICY_URL = "https://southsouthwest.com/framelog/priv
 // ---------------------------------------------------------------------------
 // Display labels for preference enums (private to this file)
 // ---------------------------------------------------------------------------
-
-private val GpsPrecision.label: String
-    get() = when (this) {
-        GpsPrecision.HIGH -> "High"
-        GpsPrecision.BATTERY_SAVER -> "Battery saver"
-    }
 
 private val ExportFormat.label: String
     get() = when (this) {
@@ -111,7 +104,6 @@ fun SettingsScreen(navController: NavHostController) {
     var showExtraFramesDialog by remember { mutableStateOf(false) }
     var draftExtraFrames by remember { mutableIntStateOf(state.extraFramesPerRoll) }
 
-    var showGpsPrecisionDialog by remember { mutableStateOf(false) }
     var showExportFormatDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
 
@@ -210,9 +202,13 @@ fun SettingsScreen(navController: NavHostController) {
             item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
             item {
                 SettingsRow(
-                    label = "GPS precision",
-                    value = state.gpsPrecision.label,
-                    onClick = { showGpsPrecisionDialog = true },
+                    label = "GPS capture",
+                    trailing = {
+                        Switch(
+                            checked = state.gpsCaptureEnabled,
+                            onCheckedChange = viewModel::onGpsCaptureEnabledChanged,
+                        )
+                    },
                 )
             }
             item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
@@ -421,23 +417,6 @@ fun SettingsScreen(navController: NavHostController) {
             },
             dismissButton = {
                 TextButton(onClick = { showExtraFramesDialog = false }) { Text("Cancel") }
-            },
-        )
-    }
-
-    // ── GPS precision dialog ───────────────────────────────────────────────
-    if (showGpsPrecisionDialog) {
-        SingleChoiceDialog(
-            title = "GPS precision",
-            options = listOf(
-                GpsPrecision.HIGH to "High",
-                GpsPrecision.BATTERY_SAVER to "Battery saver",
-            ),
-            current = state.gpsPrecision,
-            onDismiss = { showGpsPrecisionDialog = false },
-            onSelected = {
-                viewModel.onGpsPrecisionChanged(it)
-                showGpsPrecisionDialog = false
             },
         )
     }

@@ -5,6 +5,8 @@
     <!-- GPS capture on frame log (Quick Screen) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Haptic feedback via direct VibrationEffect — required for stepper and Log Frame haptics -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
