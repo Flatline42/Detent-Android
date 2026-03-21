@@ -11,6 +11,7 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.AppDatabase
 import com.southsouthwest.framelog.data.db.entity.Frame
+import com.southsouthwest.framelog.data.db.entity.FrameFilter
 import com.southsouthwest.framelog.data.repository.FrameRepository
 import kotlinx.coroutines.flow.first
 
@@ -161,6 +162,9 @@ class LogFrameAction : ActionCallback {
         val frameNumber = state[WidgetState.FRAME_NUMBER] ?: return
         val aperture = state[WidgetState.APERTURE]
         val shutter = state[WidgetState.SHUTTER]
+        val lensId: Int? = state[WidgetState.LENS_ID]?.takeIf { it != -1 }
+        val targetFilterIds: Set<Int> = parseList(state[WidgetState.FILTER_IDS] ?: "")
+            .map { it.toInt() }.toSet()
 
         val db = AppDatabase.getInstance(context)
         val appPrefs = AppPreferences(context)
@@ -182,15 +186,24 @@ class LogFrameAction : ActionCallback {
             loggedAt = System.currentTimeMillis(),
             aperture = aperture,
             shutterSpeed = shutter,
-            lensId = frame.lensId,
+            lensId = lensId,
             exposureCompensation = frame.exposureCompensation,
             lat = null,
             lng = null,
             notes = frame.notes,
         )
 
-        // Atomic write: update frame, no filter changes (empty lists)
-        frameRepository.logFrame(updatedFrame, emptyList(), emptyList())
+        // Compute filter delta relative to what is already on the frame slot.
+        // For a fresh (unlogged) frame this is always emptySet, but we read it defensively
+        // in case the user previously logged and then the widget is re-logging the same slot.
+        val previousFilterIds = db.frameDao().getFrameById(frame.id).first()
+            .filters.map { it.id }.toSet()
+        val filtersToAdd = (targetFilterIds - previousFilterIds).map { filterId ->
+            FrameFilter(frameId = frame.id, filterId = filterId)
+        }
+        val filterIdsToRemove = (previousFilterIds - targetFilterIds).toList()
+
+        frameRepository.logFrame(updatedFrame, filtersToAdd, filterIdsToRemove)
 
         // Advance the frame pointer to the next unlogged frame after the one just logged.
         // We use the pre-write rollWithDetails.frames because frames before frameNumber that

@@ -19,6 +19,7 @@ import com.southsouthwest.framelog.data.db.relation.KitWithDetails
 import com.southsouthwest.framelog.data.repository.GearRepository
 import com.southsouthwest.framelog.data.repository.KitRepository
 import com.southsouthwest.framelog.data.repository.RollRepository
+import com.southsouthwest.framelog.ui.widget.FrameLogWidgetUpdater
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -416,6 +417,9 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
         // If loaded and no active roll is set, make this the active roll
         if (loadAfterCreate && appPreferences.activeRollId == -1) {
             appPreferences.activeRollId = newRollId.toInt()
+        }
+        if (loadAfterCreate) {
+            FrameLogWidgetUpdater.update(getApplication())
         }
 
         // If this kit was used, update its lastUsedAt

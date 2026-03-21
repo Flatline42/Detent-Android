@@ -91,6 +91,18 @@ object FrameLogWidgetUpdater {
             ?: shutterList.getOrNull(shutterList.size / 2)
             ?: ""
 
+        // Carry the lens forward from the last logged frame; fall back to primary lens.
+        // Stored as -1 when neither is available.
+        val currentLensId: Int = lastLogged?.lensId ?: primaryLens?.id ?: -1
+
+        // Carry filters forward from the last logged frame. Requires a second DAO call because
+        // RollWithDetails.frames contains bare Frame entities without FrameFilter join data.
+        val currentFilterIds: List<Int> = if (lastLogged != null) {
+            db.frameDao().getFrameById(lastLogged.id).first().filters.map { it.id }
+        } else {
+            emptyList()
+        }
+
         val filmCamera = "${filmStock.name} — ${cameraBody.name}"
         val filterCount = rollWithDetails.filters.size
 
@@ -107,6 +119,8 @@ object FrameLogWidgetUpdater {
                 prefs[WidgetState.SHUTTER] = currentShutter
                 prefs[WidgetState.APERTURE_LIST] = apertureList.joinToString(",")
                 prefs[WidgetState.SHUTTER_LIST] = shutterList.joinToString(",")
+                prefs[WidgetState.LENS_ID] = currentLensId
+                prefs[WidgetState.FILTER_IDS] = currentFilterIds.joinToString(",")
             }
             FrameLogWidget().update(context, glanceId)
         }

@@ -10,6 +10,7 @@ import com.southsouthwest.framelog.data.db.AppDatabase
 import com.southsouthwest.framelog.data.db.relation.RollWithDetails
 import com.southsouthwest.framelog.data.repository.RollRepository
 import com.southsouthwest.framelog.ui.util.ExportFormatter
+import com.southsouthwest.framelog.ui.widget.FrameLogWidgetUpdater
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -188,6 +189,7 @@ class RollJournalViewModel(
             appPreferences.activeRollId = rollId
         }
         _state.update { it.copy(isActionInProgress = false) }
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
     }
 
     fun onFinishRollTapped() = viewModelScope.launch {
@@ -204,6 +206,7 @@ class RollJournalViewModel(
             appPreferences.activeRollId = -1
         }
         _state.update { it.copy(isActionInProgress = false) }
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
     }
 
     fun onArchiveTapped() = viewModelScope.launch {
@@ -237,6 +240,7 @@ class RollJournalViewModel(
             appPreferences.activeRollId = -1
         }
         rollRepository.deleteRoll(roll)
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
         _events.send(RollJournalEvent.NavigateBack)
     }
 

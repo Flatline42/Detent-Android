@@ -87,6 +87,18 @@ object WidgetState {
      * Stored here so stepper actions can step without hitting the database.
      */
     val SHUTTER_LIST = stringPreferencesKey("w_shutter_list")
+
+    /**
+     * Lens ID from the last logged frame (or the roll's primary lens when no frames are logged yet).
+     * -1 when no lens is available. Read by LogFrameAction to carry the lens forward on widget logs.
+     */
+    val LENS_ID = intPreferencesKey("w_lens_id")
+
+    /**
+     * Comma-separated filter IDs active on the last logged frame.
+     * Empty string when no filters were active. Read by LogFrameAction to carry filters forward.
+     */
+    val FILTER_IDS = stringPreferencesKey("w_filter_ids")
 }
 
 // ---------------------------------------------------------------------------

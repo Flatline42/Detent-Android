@@ -9,6 +9,7 @@ import com.southsouthwest.framelog.data.db.entity.Roll
 import com.southsouthwest.framelog.data.db.entity.RollStatus
 import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.data.repository.RollRepository
+import com.southsouthwest.framelog.ui.widget.FrameLogWidgetUpdater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -136,6 +137,7 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
         if (appPreferences.activeRollId == -1) {
             appPreferences.activeRollId = roll.id
         }
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
     }
 
     fun onDeleteTapped(roll: Roll) = viewModelScope.launch {
@@ -150,6 +152,7 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
             appPreferences.activeRollId = -1
         }
         rollRepository.deleteRoll(roll)
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
     }
 
     /**
