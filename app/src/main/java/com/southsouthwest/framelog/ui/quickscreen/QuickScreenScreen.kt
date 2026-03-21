@@ -1028,26 +1028,30 @@ private fun formatLastShot(loggedAt: Long?): String {
 }
 
 // ---------------------------------------------------------------------------
-// Haptic helpers — direct Vibrator bypasses accessibility suppression
+// Haptic helpers
 // ---------------------------------------------------------------------------
 
-/** Single firm pulse — stepper increment (+). */
-private fun vibrateIncrement(context: Context) {
-    context.getSystemService(Vibrator::class.java)
-        ?.takeIf { it.hasVibrator() }
-        ?.vibrate(VibrationEffect.createOneShot(50, 80))
-}
-
-/** Double short pulse — stepper decrement (−). */
+// All three use the identical waveform confirmed to fire on Pixel 7 (the double-pulse
+// pattern that vibrateDecrement originally used). Using the same parameters for
+// vibrateIncrement and vibrateConfirm isolates whether the issue is the waveform
+// or the code path — if increment still doesn't fire with an identical waveform to
+// decrement, the problem is elsewhere (e.g. Vibrator rate-limiting consecutive calls).
 private fun vibrateDecrement(context: Context) {
     context.getSystemService(Vibrator::class.java)
         ?.takeIf { it.hasVibrator() }
         ?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 30, 50, 30), intArrayOf(0, 80, 0, 80), -1))
 }
 
-/** Longer firm pulse — successful frame log confirmation. */
-private fun vibrateConfirm(context: Context) {
+private fun vibrateIncrement(context: Context) {
     context.getSystemService(Vibrator::class.java)
         ?.takeIf { it.hasVibrator() }
-        ?.vibrate(VibrationEffect.createOneShot(120, 200))
+        ?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 30, 50, 30), intArrayOf(0, 80, 0, 80), -1))
 }
+
+private fun vibrateConfirm(context: Context) {
+    // Longer double-pulse than the stepper — same 4-segment structure known to work on Pixel 7.
+    context.getSystemService(Vibrator::class.java)
+        ?.takeIf { it.hasVibrator() }
+        ?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 120, 80, 120), intArrayOf(0, 80, 0, 80), -1))
+}
+

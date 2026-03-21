@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Debug Files
+
+Debug files for analysis (logcat output, crash reports, stack traces, etc.) are placed in `docs/debug/` within this project. When the user references a debug file, look there first.
+
 ## Build Commands
 
 ```bash
@@ -251,13 +255,13 @@ Displayed on Quick Screen and Frame Detail filter row. Sum of non-null evReducti
 
 ## Haptics
 
-All stepper controls use directional haptic feedback:
+All stepper controls use directional haptic feedback via direct `Vibrator`/`VibrationEffect` (not `LocalHapticFeedback`, which can be suppressed by accessibility settings):
 
-*   `+` (increment) — single firm haptic (`VibrationEffect.createOneShot`)
-*   `−` (decrement) — double short pulse (`VibrationEffect.createWaveform`)
-*   Log Frame confirmation — distinct longer haptic on successful write
+*   `+` (increment) — single firm pulse: `createWaveform(longArrayOf(0, 80), intArrayOf(0, 255), -1)`
+*   `−` (decrement) — double short pulse: `createWaveform(longArrayOf(0, 30, 50, 30), intArrayOf(0, 80, 0, 80), -1)`
+*   Log Frame confirmation — longer firm pulse: `createWaveform(longArrayOf(0, 200), intArrayOf(0, 255), -1)`
 
-Respect system accessibility settings — check if haptics are enabled before triggering.
+**Important:** Use `createWaveform` for all effects — `createOneShot` is silently suppressed on some devices (confirmed on Pixel 7). Widget ActionCallbacks must use `VibratorManager.defaultVibrator` on API 31+ (Glance context doesn't reliably route `getSystemService(Vibrator)` on those API levels); fall back to `getSystemService(Vibrator)` on API 26–30.
 
 ---
 

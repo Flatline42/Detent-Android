@@ -1,8 +1,6 @@
 package com.southsouthwest.framelog.ui.widget
 
 import android.content.Context
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.action.ActionCallback
@@ -15,6 +13,9 @@ import com.southsouthwest.framelog.data.db.entity.Frame
 import com.southsouthwest.framelog.data.db.entity.FrameFilter
 import com.southsouthwest.framelog.data.repository.FrameRepository
 import kotlinx.coroutines.flow.first
+
+// Widget haptics deferred — Glance ActionCallback context does not have reliable
+// Vibrator/Looper access. Revisit in v1.1.
 
 // ---------------------------------------------------------------------------
 // Stepper direction helpers
@@ -32,35 +33,6 @@ import kotlinx.coroutines.flow.first
  *
  * If [current] isn't in the list (e.g. stale state after roll change), snap to the midpoint.
  */
-// ---------------------------------------------------------------------------
-// Haptic helpers — direct Vibrator; VIBRATE permission declared in manifest
-// ---------------------------------------------------------------------------
-
-/** Single firm pulse — stepper increment (+). */
-private fun vibrateIncrement(context: Context) {
-    context.getSystemService(Vibrator::class.java)
-        ?.takeIf { it.hasVibrator() }
-        ?.vibrate(VibrationEffect.createOneShot(50, 80))
-}
-
-/** Double short pulse — stepper decrement (−). */
-private fun vibrateDecrement(context: Context) {
-    context.getSystemService(Vibrator::class.java)
-        ?.takeIf { it.hasVibrator() }
-        ?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 30, 50, 30), intArrayOf(0, 80, 0, 80), -1))
-}
-
-/** Longer firm pulse — successful frame log confirmation. */
-private fun vibrateConfirm(context: Context) {
-    context.getSystemService(Vibrator::class.java)
-        ?.takeIf { it.hasVibrator() }
-        ?.vibrate(VibrationEffect.createOneShot(120, 200))
-}
-
-// ---------------------------------------------------------------------------
-// Stepper direction helpers
-// ---------------------------------------------------------------------------
-
 private fun stepUp(list: List<String>, current: String): String {
     if (list.isEmpty()) return current
     val idx = list.indexOf(current)
@@ -92,7 +64,6 @@ class ApertureUpAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        vibrateIncrement(context)
         updateAppWidgetState(context, glanceId) { prefs ->
             val list = parseList(prefs[WidgetState.APERTURE_LIST] ?: "")
             val current = prefs[WidgetState.APERTURE] ?: ""
@@ -111,7 +82,6 @@ class ApertureDownAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        vibrateDecrement(context)
         updateAppWidgetState(context, glanceId) { prefs ->
             val list = parseList(prefs[WidgetState.APERTURE_LIST] ?: "")
             val current = prefs[WidgetState.APERTURE] ?: ""
@@ -135,7 +105,6 @@ class ShutterUpAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        vibrateIncrement(context)
         updateAppWidgetState(context, glanceId) { prefs ->
             val list = parseList(prefs[WidgetState.SHUTTER_LIST] ?: "")
             val current = prefs[WidgetState.SHUTTER] ?: ""
@@ -154,7 +123,6 @@ class ShutterDownAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        vibrateDecrement(context)
         updateAppWidgetState(context, glanceId) { prefs ->
             val list = parseList(prefs[WidgetState.SHUTTER_LIST] ?: "")
             val current = prefs[WidgetState.SHUTTER] ?: ""
@@ -177,8 +145,6 @@ class ShutterDownAction : ActionCallback {
  *   - No GPS capture — widgets cannot request location permission.
  *   - No filter changes — the widget does not manage active filter state. FrameFilter rows
  *     for the target frame are left unchanged (empty for a fresh slot).
- *   - Haptic feedback uses direct Vibrator.vibrate() (VIBRATE permission required).
- *     The accessibility-aware LocalHapticFeedback path is unavailable outside Compose.
  *
  * After a successful write, the frame pointer advances to the next unlogged frame in
  * SharedPreferences, and FrameLogWidgetUpdater.update() fully refreshes the widget.
@@ -237,7 +203,6 @@ class LogFrameAction : ActionCallback {
         val filterIdsToRemove = (previousFilterIds - targetFilterIds).toList()
 
         frameRepository.logFrame(updatedFrame, filtersToAdd, filterIdsToRemove)
-        vibrateConfirm(context)
 
         // Full widget refresh — re-derives the frame pointer from Room (first unlogged frame
         // after the highest logged frame number, or roll complete state).

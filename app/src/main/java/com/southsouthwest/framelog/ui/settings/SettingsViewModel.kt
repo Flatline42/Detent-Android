@@ -199,22 +199,24 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     // ---------------------------------------------------------------------------
 
     /**
-     * Creates a consistent backup by checkpointing the WAL then copying the database file.
+     * Creates a consistent backup by closing Room then copying the database file.
      * Returns the absolute path of the backup file in the cache directory.
+     *
+     * Why close instead of checkpoint:
+     * WAL checkpoint (TRUNCATE/FULL) requires exclusive access — Room's connection pool
+     * keeps at least one reader alive, so the checkpoint may leave frames un-checkpointed
+     * in the WAL file even after the PRAGMA returns. Copying only the main db file then
+     * produces an incomplete snapshot (missing any writes still in the WAL).
+     *
+     * Closing Room via [AppDatabase.closeInstance] causes SQLite to perform an automatic
+     * full WAL checkpoint before the last connection is released, guaranteeing the main
+     * db file is a complete, consistent snapshot. Room reopens lazily on next access.
      */
     private fun createBackupFile(context: Context): String {
-        // Room database files live in getDatabasePath()
         val dbFile = context.getDatabasePath("framelog.db")
 
-        // Force WAL checkpoint so all writes are in the main db file, not the WAL.
-        // We do this by opening a SQLite connection and running PRAGMA wal_checkpoint.
-        android.database.sqlite.SQLiteDatabase.openDatabase(
-            dbFile.absolutePath,
-            null,
-            android.database.sqlite.SQLiteDatabase.OPEN_READWRITE,
-        ).use { db ->
-            db.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
-        }
+        // Close Room — SQLite checkpoints the WAL automatically when the last connection closes.
+        AppDatabase.closeInstance()
 
         // Copy the main database file to the cache dir as a .framelog file
         val cacheDir = context.cacheDir
