@@ -42,6 +42,22 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <!--
+            App Widget receiver. The APPWIDGET_UPDATE intent is required for the launcher
+            to find and add the widget. The meta-data block points to the widget's
+            AppWidgetProviderInfo XML (size, update period, initial layout, etc.).
+        -->
+        <receiver
+            android:name=".ui.widget.FrameLogWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/frame_log_widget_info" />
+        </receiver>
+
     </application>
 
 </manifest>

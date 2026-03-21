@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AppWidgetProviderInfo for the FRAME//LOG 2×4 home screen widget.
+
+    targetCellWidth/Height (API 31+): specifies the widget's target grid size in the launcher.
+    minWidth/minHeight: legacy fallback for API 26-30, calculated as (70n − 30)dp where n = cells.
+      4 cells wide:  70 × 4 − 30 = 250dp
+      2 cells tall:  70 × 2 − 30 = 110dp
+
+    updatePeriodMillis = 0: we manage all widget updates explicitly (after frame log, roll switch,
+    and widget add/enable). Android's minimum interval is 30 minutes anyway — far too slow for a
+    shot logger. All updates are pushed by FrameLogWidgetUpdater.
+
+    initialLayout references glance_default_loading_layout from the glance-appwidget library,
+    which shows a blank surface while Glance initialises the first render.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:resizeMode="horizontal"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:description="@string/widget_description"
+    android:widgetCategory="home_screen" />

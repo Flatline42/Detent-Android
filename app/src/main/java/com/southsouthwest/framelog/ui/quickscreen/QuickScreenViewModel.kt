@@ -13,6 +13,7 @@ import com.southsouthwest.framelog.data.db.relation.RollWithDetails
 import com.southsouthwest.framelog.data.repository.FrameRepository
 import com.southsouthwest.framelog.data.repository.RollRepository
 import com.southsouthwest.framelog.ui.util.ExposureValues
+import com.southsouthwest.framelog.ui.widget.FrameLogWidgetUpdater
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -229,6 +230,8 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
         }
         populateDraftForRoll(roll)
         _state.update { it.copy(isLoading = false) }
+        // Sync widget to the newly selected roll
+        launch { FrameLogWidgetUpdater.update(getApplication()) }
     }
 
     // ---------------------------------------------------------------------------
@@ -393,6 +396,8 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
             }
 
             _events.send(QuickScreenEvent.FrameLogged(loggedFrameNumber))
+            // Sync widget to the newly logged frame and advanced pointer
+            FrameLogWidgetUpdater.update(getApplication())
         } catch (e: Exception) {
             _events.send(QuickScreenEvent.ShowErrorMessage("Failed to log frame: ${e.message}"))
         } finally {

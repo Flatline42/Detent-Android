@@ -76,6 +76,10 @@ dependencies {
     // Location — FusedLocationProviderClient for GPS capture on frame log
     implementation(libs.play.services.location)
 
+    // Glance — home screen widget (Compose-style API over RemoteViews)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
