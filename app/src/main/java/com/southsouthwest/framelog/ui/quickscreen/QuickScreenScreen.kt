@@ -252,6 +252,8 @@ fun QuickScreenScreen(navController: NavHostController) {
                             .verticalScroll(rememberScrollState())
                             .padding(vertical = 8.dp),
                     ) {
+                        Spacer(modifier = Modifier.weight(1f))
+
                         // Frame pointer stepper
                         SmallStepper(
                             label = "frame pointer",
@@ -569,8 +571,7 @@ private fun QuickScreenHeader(
                 }
                 Text(
                     text = if (hasMultipleRolls) "$rollName  \u203a" else rollName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.displayMedium,
                     textDecoration = if (hasMultipleRolls) TextDecoration.Underline else TextDecoration.None,
                     modifier = if (hasMultipleRolls) Modifier.clickable(onClick = onHeaderTapped) else Modifier,
                 )
@@ -590,13 +591,13 @@ private fun QuickScreenHeader(
         ) {
             Text(
                 text = "Frame $currentFrameNumber / $totalFrames",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             if (totalEvText != null) {
                 Text(
                     text = totalEvText,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

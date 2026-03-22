@@ -225,7 +225,12 @@ RollSetupViewModel, RollJournalViewModel, FrameDetailViewModel, QuickScreenViewM
   - **Widget haptics fully removed** — all vibrate calls, `getVibrator` helper, and VibrationEffect/Vibrator/VibratorManager imports removed from `FrameLogWidgetActions.kt`. Single deferral comment left: "Widget haptics deferred — Glance ActionCallback context does not have reliable Vibrator/Looper access. Revisit in v1.1."
 - **Backup export data loss** — WAL checkpoint PRAGMA approach was fundamentally unreliable: Room's connection pool keeps readers alive, preventing `TRUNCATE` from completing. Calling `execSQL` on a PRAGMA that returns data also throws. Final fix: `AppDatabase.closeInstance()` before copying — SQLite performs automatic full WAL checkpoint on last-connection-close. Same pattern already used by restore. `SettingsViewModel.createBackupFile()`.
 - **New lens default aperture increments** — `LensDetailUiState.apertureIncrements` default changed from `THIRD` to `HALF`.
-- **CSV export as file attachment** — `RollJournalScreen` `ShareExportContent` handler: when mimeType is `text/csv`, writes to `cacheDir/<filename>.csv`, gets FileProvider URI, shares via `EXTRA_STREAM` + `FLAG_GRANT_READ_URI_PERMISSION`. JSON and plain text keep existing `EXTRA_TEXT` path.
+- CSV export as file attachment — `RollJournalScreen` `ShareExportContent` handler: when mimeType is `text/csv`, writes to `cacheDir/<filename>.csv`, gets FileProvider URI, shares via `EXTRA_STREAM` + `FLAG_GRANT_READ_URI_PERMISSION`. JSON and plain text keep existing `EXTRA_TEXT` path.
+
+## Changes applied (2026-03-21) — Visual Pass
+
+- **Typography & Fonts:** Added OFL fonts. `Type.kt` updated to define `SpaceGrotesk`, `ShareTechMono`, and `JetBrainsMono` and mapped them directly to Material 3 Typography tokens (e.g., `displayMedium` for ShareTechMono, `headlineSmall` for JetBrainsMono).
+- **Quick Screen Layout (60% Rule):** Added a `Spacer(Modifier.weight(1f))` at the top of the scrollable column in `QuickScreenScreen.kt` to enforce the ergonomic mapping, pushing interactive elements into the bottom "thumb zone". Top Plate UI updated to use `displayMedium` and `displaySmall` tokens.
 
 ## Bug fixes applied (2026-03-20)
 
