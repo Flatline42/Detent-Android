@@ -227,6 +227,15 @@ RollSetupViewModel, RollJournalViewModel, FrameDetailViewModel, QuickScreenViewM
 - **New lens default aperture increments** — `LensDetailUiState.apertureIncrements` default changed from `THIRD` to `HALF`.
 - CSV export as file attachment — `RollJournalScreen` `ShareExportContent` handler: when mimeType is `text/csv`, writes to `cacheDir/<filename>.csv`, gets FileProvider URI, shares via `EXTRA_STREAM` + `FLAG_GRANT_READ_URI_PERMISSION`. JSON and plain text keep existing `EXTRA_TEXT` path.
 
+## Changes applied (2026-03-23) — Branding, Themes, and Polish
+
+- **Splash Screen & Icons:** Overwrote `ic_launcher_background.xml` with a solid vector asset. Added `androidx.core:core-splashscreen` dependency. Defined `Theme.Detent.Starting` in `themes.xml` with a dark background and animated icon. Integrated `installSplashScreen()` into `MainActivity.kt`.
+- **Color Pass (High Noon / Golden Hour):** Updated `Color.kt` and `Theme.kt` with strict color definitions (`AlpineBackground`, `SafetyGold`, `GoldenHourBackground`, `BurntOrange`, `WarmCream`). Disabled `dynamicColor` by default.
+- **Theme Switching:** Added an `appThemeFlow` to `AppPreferences.kt` and wired `MainActivity` to collect it, allowing real-time switching between System, Light (High Noon), and Dark (Golden Hour) from the Settings menu.
+- **Widget Theme Constraint:** Wrapped the widget UI in a strict `GlanceTheme` using `ColorProviders` with the specific Alpine/Golden hex codes to maintain branding consistency regardless of system overrides (though the widget still respects the system-level light/dark toggle).
+- **Roll Name Default Format:** Updated `generateRollName()` in `RollSetupViewModel.kt` to include the day of the month (e.g., `d MMM ''yy` -> "23 Mar '26") for better default differentiation.
+- **Branding Pass (DETENT):** Performed a comprehensive codebase and documentation search-and-replace, updating "FRAME//LOG" to "DETENT", renaming `FrameLogTheme` to `DetentTheme`, and updating deep link schemes.
+
 ## Changes applied (2026-03-21) — Visual Pass
 
 - **Typography & Fonts:** Added OFL fonts. `Type.kt` updated to define `SpaceGrotesk`, `ShareTechMono`, and `JetBrainsMono` and mapped them directly to Material 3 Typography tokens (e.g., `displayMedium` for ShareTechMono, `headlineSmall` for JetBrainsMono).
