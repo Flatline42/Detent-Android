@@ -462,7 +462,7 @@ class RollSetupViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     private fun generateRollName(stock: FilmStock): String {
-        val date = SimpleDateFormat("MMM ''yy", Locale.US).format(Date())
+        val date = SimpleDateFormat("d MMM ''yy", Locale.US).format(Date())
         return "${stock.make} ${stock.name} — $date"
     }
 
