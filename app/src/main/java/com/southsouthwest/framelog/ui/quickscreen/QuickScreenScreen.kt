@@ -995,12 +995,13 @@ private fun EmptyState(
             modifier = Modifier.padding(32.dp),
         ) {
             Text(
-                text = "No roll loaded",
+                text = "DETENT",
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Create and load a roll to start logging frames.",
+                text = "no roll loaded — tap to create",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

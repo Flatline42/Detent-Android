@@ -302,7 +302,7 @@ private fun ActiveRollContent(prefs: Preferences, widgetSize: WidgetSize) {
 
         // --- Log Frame or Roll Complete (fills remaining height) ---
         if (isRollComplete) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("framelog://journal/$rollId"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("detent://journal/$rollId"))
             Box(
                 modifier = GlanceModifier
                     .fillMaxWidth()
@@ -531,9 +531,9 @@ private fun NoRollContent() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "FRAME//LOG",
+                text = "DETENT",
                 style = TextStyle(
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = GlanceTheme.colors.onSurface,
                     textAlign = TextAlign.Center,

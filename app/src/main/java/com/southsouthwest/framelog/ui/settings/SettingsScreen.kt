@@ -62,7 +62,7 @@ import java.io.File
 private const val TIP_JAR_URL = "https://ko-fi.com/"
 
 // TODO: Replace with actual hosted privacy policy URL before release
-private const val PRIVACY_POLICY_URL = "https://southsouthwest.com/framelog/privacy"
+private const val PRIVACY_POLICY_URL = "https://southsouthwest.com/detent/privacy"
 
 // ---------------------------------------------------------------------------
 // Display labels for preference enums (private to this file)
@@ -135,7 +135,7 @@ fun SettingsScreen(navController: NavHostController) {
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "application/octet-stream"
                         putExtra(Intent.EXTRA_STREAM, uri)
-                        putExtra(Intent.EXTRA_SUBJECT, "FRAME//LOG backup")
+                        putExtra(Intent.EXTRA_SUBJECT, "DETENT backup")
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "Share backup file"))
@@ -347,8 +347,8 @@ fun SettingsScreen(navController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = "FRAME//LOG",
-                        style = MaterialTheme.typography.labelSmall,
+                        text = "DETENT",
+                        style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(4.dp))
@@ -506,7 +506,7 @@ fun SettingsScreen(navController: NavHostController) {
         AlertDialog(
             onDismissRequest = { showRestartDialog = false },
             title = { Text("Restore complete") },
-            text = { Text("Restart FRAME//LOG to use the restored data.") },
+            text = { Text("Restart DETENT to use the restored data.") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -600,7 +600,7 @@ private fun SupportRow(onTipJarTapped: () -> Unit) {
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "If FRAME//LOG is useful to you, a tip is always appreciated",
+                text = "If DETENT is useful to you, a tip is always appreciated",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -680,7 +680,7 @@ private suspend fun copyUriToCache(context: Context, uri: Uri): String? =
         runCatching {
             val inputStream = context.contentResolver.openInputStream(uri)
                 ?: return@withContext null
-            val tempFile = File(context.cacheDir, "restore_temp.framelog")
+            val tempFile = File(context.cacheDir, "restore_temp.detent")
             inputStream.use { input ->
                 tempFile.outputStream().use { output -> input.copyTo(output) }
             }

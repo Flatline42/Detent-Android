@@ -1,0 +1,107 @@
+<svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .heading { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .meta-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .app-name { font-family: sans-serif; font-size: 22px; font-weight: 500; fill: #111; }
+      .app-tagline { font-family: sans-serif; font-size: 11px; fill: #888; }
+      .btn-label { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .btn-label-sm { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .step-num { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #aaa; }
+      .step-text { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .step-circle { fill: #efefef; stroke: #bbb; stroke-width: 1; }
+      .step-num-text { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .widget-preview { fill: #efefef; stroke: #bbb; stroke-width: 1; }
+      .widget-inner { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .btn-primary { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .icon-placeholder { fill: #efefef; stroke: #ccc; stroke-width: 0.5; }
+      .step-line { stroke: #ddd; stroke-width: 1; stroke-dasharray: 2,2; }
+    </style>
+  </defs>
+
+  <text x="10" y="14" class="heading">welcome screen</text>
+  <rect x="10" y="20" width="125" height="290" rx="16" class="outer"/>
+  <rect x="28" y="60" width="90" height="90" rx="12" class="icon-placeholder"/>
+  <text x="73" y="110" text-anchor="middle" class="meta-muted">[app icon]</text>
+  <text x="73" y="172" text-anchor="middle" class="app-name">FRAME</text>
+  <text x="73" y="186" text-anchor="middle" class="app-name">//LOG</text>
+  <text x="73" y="202" text-anchor="middle" class="app-tagline">a film photography</text>
+  <text x="73" y="214" text-anchor="middle" class="app-tagline">field journal</text>
+  <rect x="22" y="232" width="101" height="28" rx="6" class="btn-primary"/>
+  <text x="73" y="250" text-anchor="middle" class="btn-label">show me around</text>
+  <rect x="22" y="266" width="101" height="24" rx="6" class="btn"/>
+  <text x="73" y="282" text-anchor="middle" class="btn-label-sm">skip setup</text>
+  <text x="73" y="304" text-anchor="middle" class="meta-muted">v1.0.0</text>
+
+  <text x="155" y="14" class="heading">widget setup instructions</text>
+  <rect x="155" y="20" width="135" height="490" rx="16" class="outer"/>
+  <text x="165" y="42" class="small">←</text>
+  <text x="222" y="42" text-anchor="middle" class="heading">Widget Setup</text>
+  <line x1="155" y1="50" x2="290" y2="50" class="divider"/>
+
+  <rect x="165" y="58" width="115" height="70" rx="6" class="widget-preview"/>
+  <rect x="173" y="64" width="99" height="58" rx="8" class="widget-inner"/>
+  <text x="222" y="80" text-anchor="middle" class="meta-muted">HP5 — AE-1</text>
+  <text x="222" y="90" text-anchor="middle" class="meta-muted">Frame 14/38</text>
+  <text x="190" y="106" text-anchor="middle" class="meta">f/8</text>
+  <text x="254" y="106" text-anchor="middle" class="meta">125</text>
+  <rect x="173" y="112" width="99" height="6" rx="3" class="widget-preview"/>
+  <text x="222" y="118" text-anchor="middle" class="annotation">log frame</text>
+
+  <text x="165" y="144" class="meta-muted">The 2×4 widget gives you</text>
+  <text x="165" y="155" class="meta-muted">one-tap frame logging</text>
+  <text x="165" y="166" class="meta-muted">from your home screen.</text>
+
+  <line x1="155" y1="176" x2="290" y2="176" class="divider"/>
+
+  <circle cx="175" cy="198" r="10" class="step-circle"/>
+  <text x="175" y="202" text-anchor="middle" class="step-num-text">1</text>
+  <text x="191" y="194" class="step-num">long press home screen</text>
+  <text x="191" y="205" class="step-text">tap and hold an empty</text>
+  <text x="191" y="215" class="step-text">area of your home screen</text>
+  <line x1="175" y1="208" x2="175" y2="230" class="step-line"/>
+
+  <circle cx="175" cy="240" r="10" class="step-circle"/>
+  <text x="175" y="244" text-anchor="middle" class="step-num-text">2</text>
+  <text x="191" y="236" class="step-num">tap widgets</text>
+  <text x="191" y="247" class="step-text">find the widgets option</text>
+  <text x="191" y="257" class="step-text">in the menu that appears</text>
+  <line x1="175" y1="250" x2="175" y2="272" class="step-line"/>
+
+  <circle cx="175" cy="282" r="10" class="step-circle"/>
+  <text x="175" y="286" text-anchor="middle" class="step-num-text">3</text>
+  <text x="191" y="278" class="step-num">find DETENT</text>
+  <text x="191" y="289" class="step-text">scroll to find the app</text>
+  <text x="191" y="299" class="step-text">and select the 2×4 widget</text>
+  <line x1="175" y1="292" x2="175" y2="314" class="step-line"/>
+
+  <circle cx="175" cy="324" r="10" class="step-circle"/>
+  <text x="175" y="328" text-anchor="middle" class="step-num-text">4</text>
+  <text x="191" y="320" class="step-num">drag to home screen</text>
+  <text x="191" y="331" class="step-text">place it where you can</text>
+  <text x="191" y="341" class="step-text">reach it with your thumb</text>
+
+  <line x1="155" y1="358" x2="290" y2="358" class="divider"/>
+
+  <text x="165" y="372" class="meta-muted">widget placement tip:</text>
+  <text x="165" y="383" class="meta-muted">dedicate one home screen</text>
+  <text x="165" y="394" class="meta-muted">page to photography tools —</text>
+  <text x="165" y="405" class="meta-muted">light meter, sun angle app,</text>
+  <text x="165" y="416" class="meta-muted">and DETENT widget.</text>
+
+  <line x1="155" y1="426" x2="290" y2="426" class="divider"/>
+
+  <rect x="165" y="434" width="115" height="28" rx="6" class="btn-primary"/>
+  <text x="222" y="452" text-anchor="middle" class="btn-label">done</text>
+
+  <text x="222" y="476" text-anchor="middle" class="meta-muted">also in settings</text>
+  <text x="222" y="488" text-anchor="middle" class="meta-muted">anytime you need it</text>
+</svg>
+

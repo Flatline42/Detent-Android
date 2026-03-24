@@ -1,0 +1,110 @@
+<svg viewBox="0 0 260 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .label { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .value { font-family: sans-serif; font-size: 18px; font-weight: 500; fill: #111; }
+      .value-sm { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .btn-label { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .arrow { font-family: sans-serif; font-size: 16px; font-weight: 500; fill: #888; }
+      .arrow-sm { font-family: sans-serif; font-size: 12px; fill: #888; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .logbtn { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .chip-on { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .chip-off { fill: #efefef; stroke: #ddd; stroke-width: 0.5; }
+      .chip-text-on { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #111; }
+      .chip-text-off { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .note-input { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="520" rx="16" class="outer"/>
+
+  <rect x="10" y="10" width="240" height="50" rx="16" class="box"/>
+  <rect x="10" y="48" width="240" height="12" class="box"/>
+  <text x="20" y="28" class="small">HP5 Plus — Canon AE-1</text>
+  <text x="230" y="28" text-anchor="end" class="small">●● filters</text>
+  <text x="20" y="42" class="small-muted">Frame 14 / 38</text>
+  <text x="230" y="42" text-anchor="end" class="small-muted">-2.5 EV</text>
+
+  <line x1="10" y1="60" x2="250" y2="60" class="divider"/>
+
+  <text x="20" y="76" class="label">lens</text>
+  <rect x="20" y="80" width="210" height="26" rx="4" class="box"/>
+  <text x="125" y="97" text-anchor="middle" class="value-sm">FD 50mm f/1.4  ›</text>
+
+  <text x="20" y="120" class="label">filters</text>
+  <rect x="20" y="124" width="36" height="18" rx="9" class="chip-on"/>
+  <text x="38" y="137" text-anchor="middle" class="chip-text-on">YK2</text>
+  <rect x="60" y="124" width="28" height="18" rx="9" class="chip-on"/>
+  <text x="74" y="137" text-anchor="middle" class="chip-text-on">UV</text>
+  <rect x="92" y="124" width="34" height="18" rx="9" class="chip-off"/>
+  <text x="109" y="137" text-anchor="middle" class="chip-text-off">ND8</text>
+  <rect x="130" y="124" width="18" height="18" rx="9" class="btn"/>
+  <text x="139" y="137" text-anchor="middle" class="chip-text-on">+</text>
+  <text x="230" y="137" text-anchor="end" class="small-muted">-1.0 EV</text>
+
+  <line x1="10" y1="152" x2="250" y2="152" class="divider"/>
+
+  <text x="125" y="168" text-anchor="middle" class="label">exposure compensation</text>
+  <rect x="72" y="172" width="26" height="24" rx="4" class="btn"/>
+  <text x="85" y="189" text-anchor="middle" class="arrow-sm">−</text>
+  <rect x="102" y="172" width="56" height="24" rx="4" class="box"/>
+  <text x="130" y="189" text-anchor="middle" class="value-sm">-1.0 EV</text>
+  <rect x="162" y="172" width="26" height="24" rx="4" class="btn"/>
+  <text x="175" y="189" text-anchor="middle" class="arrow-sm">+</text>
+
+  <text x="125" y="212" text-anchor="middle" class="label">frame pointer</text>
+  <rect x="72" y="216" width="26" height="24" rx="4" class="btn"/>
+  <text x="85" y="233" text-anchor="middle" class="arrow-sm">−</text>
+  <rect x="102" y="216" width="56" height="24" rx="4" class="box"/>
+  <text x="130" y="233" text-anchor="middle" class="value-sm">14 / 38</text>
+  <rect x="162" y="216" width="26" height="24" rx="4" class="btn"/>
+  <text x="175" y="233" text-anchor="middle" class="arrow-sm">+</text>
+
+  <line x1="10" y1="250" x2="250" y2="250" class="divider"/>
+
+  <text x="125" y="266" text-anchor="middle" class="label">aperture</text>
+  <rect x="32" y="270" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="297" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="270" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="297" text-anchor="middle" class="value">f/8</text>
+  <rect x="176" y="270" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="297" text-anchor="middle" class="arrow">+</text>
+
+  <text x="125" y="326" text-anchor="middle" class="label">shutter speed</text>
+  <rect x="32" y="330" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="357" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="330" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="357" text-anchor="middle" class="value">125</text>
+  <rect x="176" y="330" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="357" text-anchor="middle" class="arrow">+</text>
+
+  <line x1="10" y1="382" x2="250" y2="382" class="divider"/>
+
+  <text x="20" y="396" class="label">note</text>
+  <rect x="20" y="400" width="178" height="26" rx="4" class="note-input"/>
+  <text x="109" y="417" text-anchor="middle" class="small-muted">tap to type...</text>
+  <rect x="202" y="400" width="28" height="26" rx="4" class="btn"/>
+  <text x="216" y="417" text-anchor="middle" class="small">🎤</text>
+
+  <line x1="10" y1="436" x2="250" y2="436" class="divider"/>
+
+  <rect x="20" y="446" width="210" height="70" rx="8" class="logbtn"/>
+  <text x="125" y="487" text-anchor="middle" class="btn-label">log frame</text>
+
+  <text x="258" y="35" class="annotation">40%</text>
+  <text x="258" y="44" class="annotation">read</text>
+  <text x="258" y="53" class="annotation">only</text>
+  <line x1="254" y1="10" x2="254" y2="60" style="stroke:#ddd;stroke-width:0.5;stroke-dasharray:2,2;"/>
+  <line x1="254" y1="60" x2="254" y2="530" style="stroke:#ddd;stroke-width:0.5;stroke-dasharray:2,2;"/>
+  <text x="258" y="300" class="annotation">60%</text>
+  <text x="258" y="309" class="annotation">inter-</text>
+  <text x="258" y="318" class="annotation">active</text>
+</svg>
+

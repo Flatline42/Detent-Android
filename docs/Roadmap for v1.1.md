@@ -1,5 +1,5 @@
 # Roadmap for v1.1
-## FRAME//LOG — v1.1 Roadmap
+## DETENT — v1.1 Roadmap
 
 ## UI / Interaction
 
@@ -56,3 +56,4 @@ Continuous value input rather than discrete stepper. Required for cine lenses wi
 ---
 
 Before public release — implement Room migration strategy. All schema changes require Migration objects. Test upgrade path from v1.0 schema.
+

@@ -21,7 +21,7 @@ Tested on Pixel 7, Android 13/14, system haptics enabled.
 
 **Rule:** Any new haptic effect on Pixel 7 must use a 4-segment (minimum) `createWaveform` array.
 
-**Widget context extra requirement:** In Glance `ActionCallback.onAction()`, use `VibratorManager.defaultVibrator` on API 31+ — the `context` parameter doesn't reliably route `getSystemService(Vibrator::class.java)` on those API levels. See `getVibrator()` helper in `FrameLogWidgetActions.kt`.
+**Widget context extra requirement:** In Glance `ActionCallback.onAction()`, use `VibratorManager.defaultVibrator` on API 31+ — the `context` parameter doesn't reliably route `getSystemService(Vibrator::class.java)` on those API levels. See `getVibrator()` helper in `DETENTWidgetActions.kt`.
 
 **Current working patterns in the app:**
 ```kotlin
@@ -44,3 +44,6 @@ Directional differentiation between + and − is deferred. May revisit when refa
 The 12dp gap between standard formula (180dp) and Pixel 7 actual (192dp) for 3 rows was enough to prevent the resize handle from reaching the 3-row snap point when `maxResizeHeight="180dp"`. Fixed by setting `maxResizeHeight="250dp"` in `frame_log_widget_info.xml`.
 
 The `SizeMode.Responsive` height thresholds (180dp for COMPACT and LOOSE) remain correct: 192dp ≥ 180dp so the right layout activates once 3 rows is reachable on Pixel 7.
+
+
+

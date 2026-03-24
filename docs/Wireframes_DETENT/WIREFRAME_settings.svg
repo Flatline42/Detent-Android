@@ -1,0 +1,116 @@
+<svg viewBox="0 0 260 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .meta-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .screen-title { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .section-head { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #aaa; }
+      .setting-label { font-family: sans-serif; font-size: 10px; fill: #111; }
+      .setting-value { font-family: sans-serif; font-size: 10px; fill: #aaa; }
+      .setting-desc { font-family: sans-serif; font-size: 8px; fill: #aaa; }
+      .btn-label { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .row { fill: #fff; stroke: none; }
+      .toggle-off { fill: #efefef; stroke: #ddd; stroke-width: 0.5; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .divider-section { stroke: #ccc; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .chevron { font-family: sans-serif; font-size: 10px; fill: #aaa; }
+      .tip-btn { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .tip-label { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="680" rx="16" class="outer"/>
+
+  <rect x="10" y="10" width="240" height="34" rx="16" class="box"/>
+  <rect x="10" y="32" width="240" height="12" class="box"/>
+  <text x="125" y="28" text-anchor="middle" class="screen-title">Settings</text>
+
+  <line x1="10" y1="44" x2="250" y2="44" class="divider"/>
+
+  <text x="20" y="58" class="section-head">SHOOTING DEFAULTS</text>
+  <rect x="10" y="62" width="240" height="30" class="row"/>
+  <text x="20" y="81" class="setting-label">Extra frames per roll</text>
+  <text x="230" y="81" text-anchor="end" class="setting-value">2  ›</text>
+  <line x1="20" y1="92" x2="240" y2="92" class="divider"/>
+  <rect x="10" y="92" width="240" height="30" class="row"/>
+  <text x="20" y="111" class="setting-label">GPS precision</text>
+  <text x="230" y="111" text-anchor="end" class="setting-value">high  ›</text>
+  <line x1="20" y1="122" x2="240" y2="122" class="divider"/>
+  <rect x="10" y="122" width="240" height="30" class="row"/>
+  <text x="20" y="141" class="setting-label">Default export format</text>
+  <text x="230" y="141" text-anchor="end" class="setting-value">CSV  ›</text>
+
+  <line x1="10" y1="152" x2="250" y2="152" class="divider-section"/>
+
+  <text x="20" y="166" class="section-head">APPEARANCE</text>
+  <rect x="10" y="170" width="240" height="30" class="row"/>
+  <text x="20" y="189" class="setting-label">App theme</text>
+  <text x="230" y="189" text-anchor="end" class="setting-value">system  ›</text>
+  <line x1="20" y1="200" x2="240" y2="200" class="divider"/>
+  <rect x="10" y="200" width="240" height="30" class="row"/>
+  <text x="20" y="219" class="setting-label">Accessible color mode</text>
+  <rect x="196" y="209" width="40" height="18" rx="9" class="toggle-off"/>
+  <text x="216" y="222" text-anchor="middle" class="meta-muted">off</text>
+
+  <line x1="10" y1="230" x2="250" y2="230" class="divider-section"/>
+
+  <text x="20" y="244" class="section-head">DATA &amp; BACKUP</text>
+  <rect x="10" y="248" width="240" height="30" class="row"/>
+  <text x="20" y="267" class="setting-label">Export backup</text>
+  <text x="230" y="267" text-anchor="end" class="chevron">›</text>
+  <line x1="20" y1="278" x2="240" y2="278" class="divider"/>
+  <rect x="10" y="278" width="240" height="30" class="row"/>
+  <text x="20" y="297" class="setting-label">Restore from backup</text>
+  <text x="230" y="297" text-anchor="end" class="chevron">›</text>
+
+  <line x1="10" y1="308" x2="250" y2="308" class="divider-section"/>
+
+  <text x="20" y="322" class="section-head">WIDGET</text>
+  <rect x="10" y="326" width="240" height="30" class="row"/>
+  <text x="20" y="345" class="setting-label">Widget setup instructions</text>
+  <text x="230" y="345" text-anchor="end" class="chevron">›</text>
+
+  <line x1="10" y1="356" x2="250" y2="356" class="divider-section"/>
+
+  <text x="20" y="370" class="section-head">ONBOARDING</text>
+  <rect x="10" y="374" width="240" height="30" class="row"/>
+  <text x="20" y="393" class="setting-label">Re-run introduction</text>
+  <text x="230" y="393" text-anchor="end" class="chevron">›</text>
+
+  <line x1="10" y1="404" x2="250" y2="404" class="divider-section"/>
+
+  <text x="20" y="418" class="section-head">SUPPORT</text>
+  <rect x="10" y="422" width="240" height="50" class="row"/>
+  <text x="20" y="441" class="setting-label">Buy me a coffee</text>
+  <text x="20" y="453" class="setting-desc">If DETENT is useful to you, a tip is always appreciated</text>
+  <rect x="160" y="428" width="70" height="26" rx="6" class="tip-btn"/>
+  <text x="195" y="445" text-anchor="middle" class="tip-label">tip jar  ›</text>
+
+  <line x1="10" y1="472" x2="250" y2="472" class="divider-section"/>
+
+  <text x="20" y="486" class="section-head">ABOUT</text>
+  <rect x="10" y="490" width="240" height="30" class="row"/>
+  <text x="20" y="509" class="setting-label">Version</text>
+  <text x="230" y="509" text-anchor="end" class="setting-value">1.0.0</text>
+  <line x1="20" y1="520" x2="240" y2="520" class="divider"/>
+  <rect x="10" y="520" width="240" height="30" class="row"/>
+  <text x="20" y="539" class="setting-label">Privacy policy</text>
+  <text x="230" y="539" text-anchor="end" class="chevron">›</text>
+  <line x1="20" y1="550" x2="240" y2="550" class="divider"/>
+  <rect x="10" y="550" width="240" height="30" class="row"/>
+  <text x="20" y="569" class="setting-label">Open source licenses</text>
+  <text x="230" y="569" text-anchor="end" class="chevron">›</text>
+
+  <text x="125" y="610" text-anchor="middle" class="meta-muted">DETENT</text>
+  <text x="125" y="622" text-anchor="middle" class="setting-desc">made by a film photographer, for film photographers</text>
+
+  <text x="258" y="350" class="annotation">scroll</text>
+  <line x1="254" y1="44" x2="254" y2="580" style="stroke:#ddd;stroke-width:0.5;stroke-dasharray:2,2;"/>
+</svg>
+

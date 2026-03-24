@@ -16,27 +16,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FrameLog">
+        android:theme="@style/Theme.Detent">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FrameLog">
+            android:theme="@style/Theme.Detent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <!--
                 Deep link used by the widget's Roll Complete button to navigate directly
-                to the Roll Journal for the active roll. URI format: framelog://journal/{rollId}
+                to the Roll Journal for the active roll. URI format: detent://journal/{rollId}
                 Matched by the RollJournal composable in NavGraph via navDeepLink.
             -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="framelog" android:host="journal" />
+                <data android:scheme="detent" android:host="journal" />
             </intent-filter>
         </activity>
 

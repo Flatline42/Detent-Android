@@ -1,0 +1,67 @@
+<svg viewBox="0 0 260 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .screen-title { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .format-label { font-family: sans-serif; font-size: 11px; fill: #111; }
+      .format-desc { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .btn-label { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; }
+      .radio-outer { fill: none; stroke: #888; stroke-width: 1; }
+      .radio-inner { fill: #888; }
+      .radio-empty { fill: none; stroke: #ccc; stroke-width: 1; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .sheet { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .btn-primary { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .row { fill: #fff; stroke: none; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .handle { fill: #ccc; }
+      .deferred { font-family: sans-serif; font-size: 9px; fill: #aaa; font-style: italic; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="400" rx="16" class="outer"/>
+  <text x="125" y="35" text-anchor="middle" class="small-muted">Roll Journal View — background</text>
+  <text x="125" y="50" text-anchor="middle" class="small-muted">· · ·</text>
+
+  <rect x="10" y="160" width="240" height="250" rx="16" class="sheet"/>
+  <rect x="10" y="160" width="240" height="20" rx="16" class="sheet"/>
+
+  <rect x="105" y="167" width="50" height="5" rx="3" class="handle"/>
+
+  <text x="125" y="200" text-anchor="middle" class="screen-title">Export roll</text>
+  <text x="125" y="213" text-anchor="middle" class="small-muted">HP5 Plus — AE-1  ·  38 frames</text>
+
+  <line x1="20" y1="220" x2="240" y2="220" class="divider"/>
+
+  <rect x="20" y="228" width="210" height="36" rx="4" class="row"/>
+  <circle cx="34" cy="246" r="7" class="radio-outer"/>
+  <circle cx="34" cy="246" r="4" class="radio-inner"/>
+  <text x="48" y="243" class="format-label">CSV</text>
+  <text x="48" y="255" class="format-desc">spreadsheet import, general data work</text>
+  <line x1="20" y1="264" x2="240" y2="264" class="divider"/>
+
+  <rect x="20" y="264" width="210" height="36" rx="4" class="row"/>
+  <circle cx="34" cy="282" r="7" class="radio-empty"/>
+  <text x="48" y="279" class="format-label">JSON</text>
+  <text x="48" y="291" class="format-desc">programmatic use, custom tooling</text>
+  <line x1="20" y1="300" x2="240" y2="300" class="divider"/>
+
+  <rect x="20" y="300" width="210" height="36" rx="4" class="row"/>
+  <circle cx="34" cy="318" r="7" class="radio-empty"/>
+  <text x="48" y="315" class="format-label">Plain text</text>
+  <text x="48" y="327" class="format-desc">human-readable log, easy to print</text>
+
+  <line x1="20" y1="336" x2="240" y2="336" class="divider"/>
+
+  <text x="20" y="350" class="deferred">Google Sheets, ExifTool — coming in v1.1</text>
+
+  <rect x="20" y="358" width="210" height="34" rx="6" class="btn-primary"/>
+  <text x="125" y="380" text-anchor="middle" class="btn-label">export  ›  share sheet</text>
+
+  <text x="258" y="300" class="annotation">bottom</text>
+  <text x="258" y="310" class="annotation">sheet</text>
+</svg>
+

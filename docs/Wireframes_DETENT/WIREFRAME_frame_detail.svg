@@ -1,0 +1,115 @@
+<svg viewBox="0 0 260 580" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .meta { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .meta-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .roll-name { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .value { font-family: sans-serif; font-size: 18px; font-weight: 500; fill: #111; }
+      .value-sm { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .btn-label { font-family: sans-serif; font-size: 11px; font-weight: 500; fill: #111; }
+      .btn-label-sm { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .label { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .arrow { font-family: sans-serif; font-size: 16px; font-weight: 500; fill: #888; }
+      .arrow-sm { font-family: sans-serif; font-size: 12px; fill: #888; }
+      .chip-on { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .chip-off { fill: #efefef; stroke: #ddd; stroke-width: 0.5; }
+      .chip-text-on { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #111; }
+      .chip-text-off { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .btn-primary { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .toggle-on { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 8px; fill: #bbb; }
+      .note-input { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .meta-info { font-family: sans-serif; font-size: 9px; fill: #aaa; font-style: italic; }
+      .tappable { font-family: sans-serif; font-size: 9px; fill: #4a90d9; font-style: italic; }
+    </style>
+  </defs>
+
+  <rect x="10" y="10" width="240" height="560" rx="16" class="outer"/>
+
+  <rect x="10" y="10" width="240" height="44" rx="16" class="box"/>
+  <rect x="10" y="42" width="240" height="12" class="box"/>
+  <text x="22" y="28" class="small">←</text>
+  <text x="125" y="28" text-anchor="middle" class="roll-name">Frame 14</text>
+  <text x="125" y="40" text-anchor="middle" class="small-muted">HP5 Plus — AE-1  ·  14:32  ·  GPS logged</text>
+
+  <line x1="10" y1="54" x2="250" y2="54" class="divider"/>
+
+  <text x="20" y="68" class="label">logged</text>
+  <rect x="60" y="58" width="36" height="18" rx="9" class="toggle-on"/>
+  <text x="78" y="71" text-anchor="middle" class="chip-text-on">yes</text>
+  <text x="104" y="70" class="meta-muted">tap to mark unlogged</text>
+
+  <line x1="10" y1="82" x2="250" y2="82" class="divider"/>
+
+  <text x="20" y="96" class="label">lens</text>
+  <rect x="20" y="100" width="210" height="26" rx="4" class="box"/>
+  <text x="125" y="117" text-anchor="middle" class="value-sm">FD 50mm f/1.4  ›</text>
+
+  <text x="20" y="140" class="label">filters</text>
+  <rect x="20" y="144" width="36" height="18" rx="9" class="chip-on"/>
+  <text x="38" y="157" text-anchor="middle" class="chip-text-on">YK2</text>
+  <rect x="60" y="144" width="28" height="18" rx="9" class="chip-on"/>
+  <text x="74" y="157" text-anchor="middle" class="chip-text-on">UV</text>
+  <rect x="92" y="144" width="34" height="18" rx="9" class="chip-off"/>
+  <text x="109" y="157" text-anchor="middle" class="chip-text-off">ND8</text>
+  <rect x="130" y="144" width="18" height="18" rx="9" class="btn"/>
+  <text x="139" y="157" text-anchor="middle" class="chip-text-on">+</text>
+  <text x="230" y="157" text-anchor="end" class="small-muted">-1.0 EV</text>
+
+  <line x1="10" y1="172" x2="250" y2="172" class="divider"/>
+
+  <text x="125" y="186" text-anchor="middle" class="label">exposure compensation</text>
+  <rect x="72" y="190" width="26" height="24" rx="4" class="btn"/>
+  <text x="85" y="207" text-anchor="middle" class="arrow-sm">−</text>
+  <rect x="102" y="190" width="56" height="24" rx="4" class="box"/>
+  <text x="130" y="207" text-anchor="middle" class="value-sm">-1.0 EV</text>
+  <rect x="162" y="190" width="26" height="24" rx="4" class="btn"/>
+  <text x="175" y="207" text-anchor="middle" class="arrow-sm">+</text>
+
+  <line x1="10" y1="224" x2="250" y2="224" class="divider"/>
+
+  <text x="125" y="238" text-anchor="middle" class="label">aperture</text>
+  <rect x="32" y="242" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="269" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="242" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="269" text-anchor="middle" class="value">f/8</text>
+  <rect x="176" y="242" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="269" text-anchor="middle" class="arrow">+</text>
+
+  <text x="125" y="298" text-anchor="middle" class="label">shutter speed</text>
+  <rect x="32" y="302" width="42" height="42" rx="6" class="btn"/>
+  <text x="53" y="329" text-anchor="middle" class="arrow">−</text>
+  <rect x="80" y="302" width="90" height="42" rx="6" class="box"/>
+  <text x="125" y="329" text-anchor="middle" class="value">125</text>
+  <rect x="176" y="302" width="42" height="42" rx="6" class="btn"/>
+  <text x="197" y="329" text-anchor="middle" class="arrow">+</text>
+
+  <line x1="10" y1="354" x2="250" y2="354" class="divider"/>
+
+  <text x="20" y="368" class="label">note</text>
+  <rect x="20" y="372" width="178" height="40" rx="4" class="note-input"/>
+  <text x="109" y="396" text-anchor="middle" class="small-muted">"good light here"</text>
+  <rect x="202" y="372" width="28" height="40" rx="4" class="btn"/>
+  <text x="216" y="396" text-anchor="middle" class="small">mic</text>
+
+  <line x1="10" y1="422" x2="250" y2="422" class="divider"/>
+
+  <text x="20" y="434" class="meta-info">logged 2026-03-06 at 14:32</text>
+  <text x="20" y="446" class="tappable">37.7749, -119.5183  ›</text>
+
+  <line x1="10" y1="456" x2="250" y2="456" class="divider"/>
+
+  <rect x="20" y="464" width="210" height="46" rx="8" class="btn-primary"/>
+  <text x="125" y="493" text-anchor="middle" class="btn-label">save changes</text>
+
+  <text x="258" y="300" class="annotation">same</text>
+  <text x="258" y="310" class="annotation">layout</text>
+  <text x="258" y="320" class="annotation">as QS</text>
+</svg>
+

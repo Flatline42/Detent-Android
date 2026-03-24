@@ -128,7 +128,7 @@ fun FrameLogNavGraph(navController: NavHostController) {
                 }
 
                 composable<RollJournal>(
-                    deepLinks = listOf(navDeepLink { uriPattern = "framelog://journal/{rollId}" }),
+                    deepLinks = listOf(navDeepLink { uriPattern = "detent://journal/{rollId}" }),
                 ) {
                     RollJournalScreen(navController = navController)
                 }

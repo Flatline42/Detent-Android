@@ -1,0 +1,64 @@
+<svg viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .field-label { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .value { font-family: sans-serif; font-size: 15px; font-weight: 500; fill: #111; }
+      .btn-label { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-r { font-family: sans-serif; font-size: 10px; fill: #888; text-anchor: end; }
+      .small-bold { font-family: sans-serif; font-size: 10px; font-weight: 500; fill: #111; text-anchor: end; }
+      .frame { font-family: sans-serif; font-size: 10px; fill: #aaa; }
+      .arrow { font-family: sans-serif; font-size: 16px; font-weight: 500; fill: #888; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .logbtn { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .annotation { font-family: monospace; font-size: 9px; fill: #bbb; }
+    </style>
+  </defs>
+
+  <rect x="40" y="10" width="240" height="190" rx="12" class="outer"/>
+  <rect x="40" y="10" width="240" height="48" rx="12" class="box"/>
+  <rect x="40" y="46" width="240" height="12" class="box"/>
+
+  <text x="52" y="26" class="small">HP5 Plus — Canon AE-1</text>
+  <text x="268" y="26" class="small-bold">●● filters</text>
+  <text x="52" y="40" class="frame">Frame 14 / 38</text>
+  <text x="268" y="40" class="small-r">-2.5 EV</text>
+
+  <line x1="40" y1="58" x2="280" y2="58" class="divider"/>
+
+  <text x="100" y="74" text-anchor="middle" class="field-label">aperture</text>
+  <text x="220" y="74" text-anchor="middle" class="field-label">shutter speed</text>
+
+  <rect x="52" y="78" width="28" height="28" rx="4" class="btn"/>
+  <text x="66" y="97" text-anchor="middle" class="arrow">−</text>
+
+  <rect x="86" y="78" width="40" height="28" rx="4" class="box"/>
+  <text x="106" y="97" text-anchor="middle" class="value">f/8</text>
+
+  <rect x="132" y="78" width="28" height="28" rx="4" class="btn"/>
+  <text x="146" y="97" text-anchor="middle" class="arrow">+</text>
+
+  <rect x="172" y="78" width="28" height="28" rx="4" class="btn"/>
+  <text x="186" y="97" text-anchor="middle" class="arrow">−</text>
+
+  <rect x="206" y="78" width="44" height="28" rx="4" class="box"/>
+  <text x="228" y="97" text-anchor="middle" class="value">125</text>
+
+  <rect x="256" y="78" width="28" height="28" rx="4" class="btn"/>
+  <text x="270" y="97" text-anchor="middle" class="arrow">+</text>
+
+  <line x1="40" y1="114" x2="280" y2="114" class="divider"/>
+
+  <rect x="52" y="124" width="228" height="62" rx="8" class="logbtn"/>
+  <text x="166" y="161" text-anchor="middle" class="btn-label">log frame</text>
+
+  <text x="8" y="36" text-anchor="middle" class="annotation" transform="rotate(-90,8,36)">row 1</text>
+  <text x="8" y="96" text-anchor="middle" class="annotation" transform="rotate(-90,8,96)">row 2</text>
+  <text x="8" y="156" text-anchor="middle" class="annotation" transform="rotate(-90,8,156)">row 3–4</text>
+
+  <text x="290" y="60" class="annotation">v3</text>
+</svg>
+

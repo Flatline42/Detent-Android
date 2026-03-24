@@ -126,7 +126,7 @@ object ExportFormatter {
      * Modeled after a film photography lab printout.
      */
     fun toPlainText(export: RollExport): String = buildString {
-        appendLine("FRAME//LOG Export")
+        appendLine("DETENT Export")
         appendLine("═".repeat(40))
         appendLine("Roll:       ${export.rollName}")
         appendLine("Film:       ${export.filmStockMake} ${export.filmStockName}")

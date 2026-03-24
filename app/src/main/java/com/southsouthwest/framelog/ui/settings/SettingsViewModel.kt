@@ -151,7 +151,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     /**
      * Replaces the current database with a user-provided backup file.
      *
-     * [backupFilePath] is the path to the .framelog file selected by the user via
+     * [backupFilePath] is the path to the .detent file selected by the user via
      * the system file picker. This operation is destructive — all current data is
      * overwritten. The caller must have shown a danger confirmation before invoking.
      *
@@ -213,15 +213,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
      * db file is a complete, consistent snapshot. Room reopens lazily on next access.
      */
     private fun createBackupFile(context: Context): String {
-        val dbFile = context.getDatabasePath("framelog.db")
+        val dbFile = context.getDatabasePath("detent.db")
 
         // Close Room — SQLite checkpoints the WAL automatically when the last connection closes.
         AppDatabase.closeInstance()
 
-        // Copy the main database file to the cache dir as a .framelog file
+        // Copy the main database file to the cache dir as a .detent file
         val cacheDir = context.cacheDir
         val timestamp = System.currentTimeMillis()
-        val backupFile = File(cacheDir, "framelog_backup_$timestamp.framelog")
+        val backupFile = File(cacheDir, "detent_backup_$timestamp.detent")
         dbFile.copyTo(backupFile, overwrite = true)
         return backupFile.absolutePath
     }
@@ -240,7 +240,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         val backupFile = File(backupFilePath)
         require(backupFile.exists()) { "Backup file not found: $backupFilePath" }
 
-        val dbFile = context.getDatabasePath("framelog.db")
+        val dbFile = context.getDatabasePath("detent.db")
 
         // Close the Room singleton before overwriting the file
         AppDatabase.closeInstance()

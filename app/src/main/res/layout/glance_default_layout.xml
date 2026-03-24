@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Placeholder layout for Jetpack Glance home screen widget.
+    Glance-based widgets are rendered via Compose, but Android's AppWidgetProviderInfo
+    still requires an initial XML layout resource. This layout serves as a simple
+    container until the Glance system takes over and renders the interactive UI.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@android:id/content" />

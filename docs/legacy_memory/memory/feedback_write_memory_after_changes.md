@@ -8,4 +8,7 @@ Always write memory updates at the end of a session after completing implementat
 
 **Why:** User had to prompt to catch up on memory that should have been written after the session's changes were verified.
 
-**How to apply:** After a build passes or a meaningful chunk of work is done, update `project_framelog_status.md` and any relevant feedback/project memories before considering the task complete. This applies even at context boundaries (end of session, post-summary continuation).
+**How to apply:** After a build passes or a meaningful chunk of work is done, update `project_DETENT_status.md` and any relevant feedback/project memories before considering the task complete. This applies even at context boundaries (end of session, post-summary continuation).
+
+
+

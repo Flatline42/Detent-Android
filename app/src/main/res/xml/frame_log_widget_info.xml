@@ -1,49 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    AppWidgetProviderInfo for the FRAME//LOG home screen widget.
-
-    Three supported size configurations (SizeMode.Responsive in FrameLogWidget.kt):
-      STANDARD — 4×2 cells (250×110dp): default placement, steppers side-by-side
-      COMPACT  — 4×3 cells (250×180dp): taller, enlarged side-by-side steppers
-      LOOSE    — 5×3 cells (320×180dp): taller + wider, stacked full-width steppers
-
-    targetCellWidth/Height (API 31+): default placement size in the launcher (cell counts).
-    minWidth/minHeight: legacy fallback for API 26–30; formula is (70n − 30)dp.
-      4 cells wide:  70 × 4 − 30 = 250dp
-      2 cells tall:  70 × 2 − 30 = 110dp
-
-    maxResizeWidth/maxResizeHeight (API 31+): caps the resize handle.
-
-    PIXEL 7 NOTE — launcher row height is ~74dp (vs the standard 70dp formula).
-    This matters for maxResizeHeight:
-      Standard formula:  3 rows = 70 × 3 − 30 = 180dp
-      Pixel 7 actual:    3 rows = 74 × 3 − 30 = 192dp
-    Setting maxResizeHeight to the standard-formula value (180dp) leaves Pixel 7
-    users 12dp short of the 3-row snap point — the resize handle can't reach it.
-    maxResizeHeight is set to 250dp to clear 3 rows on any launcher.
-
-    Column width on Pixel 7 follows the standard 70dp formula: 5 columns = 320dp,
-    which matches maxResizeWidth exactly and snaps correctly to the 5-cell boundary.
-
-    resizeMode="horizontal|vertical": allows the user to resize in both axes so all
-    three size variants are reachable on the home screen.
-
-    updatePeriodMillis = 0: all widget updates are pushed explicitly by
-    FrameLogWidgetUpdater (after frame log, roll switch, and widget add/enable).
-    Android's minimum interval is 30 minutes — far too slow for a shot logger.
-
-    initialLayout references glance_default_loading_layout from the glance-appwidget
-    library, which shows a blank surface while Glance initialises the first render.
--->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/glance_default_layout"
     android:minWidth="250dp"
     android:minHeight="110dp"
-    android:targetCellWidth="4"
-    android:targetCellHeight="2"
-    android:maxResizeWidth="320dp"
-    android:maxResizeHeight="250dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
-    android:initialLayout="@layout/glance_default_loading_layout"
-    android:description="@string/widget_description"
     android:widgetCategory="home_screen" />

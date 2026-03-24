@@ -152,7 +152,7 @@ abstract class AppDatabase : RoomDatabase() {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "framelog.db",
+                    "detent.db",
                 ).build().also { instance = it }
             }
         }

@@ -116,3 +116,4 @@ Just:
 ```
 
 One row, self-explanatory, recovers the vertical space the label was taking. Consistent with how other optional fields are handled — the row itself communicates its purpose and optionality.
+

@@ -96,7 +96,7 @@ Functional design decisions made during wireframing. These are not aesthetic cho
 
 **Rationale:** Per-roll CSV/JSON export is for data extraction. A full backup is for continuity — phone replacement, factory reset, data loss prevention. A journaling app with no backup path puts years of logged rolls at risk.
 
-**Implementation:** Export writes the SQLite database as a `.framelog` file to Downloads or via Android share sheet (Google Drive, email, etc.). Restore reads a `.framelog` file and replaces the current database with confirmation prompt.
+**Implementation:** Export writes the SQLite database as a `.DETENT` file to Downloads or via Android share sheet (Google Drive, email, etc.). Restore reads a `.DETENT` file and replaces the current database with confirmation prompt.
 
 **Setting:** New "Data & Backup" section in Settings containing two actions — Export Backup and Restore from Backup.
 
@@ -307,7 +307,7 @@ Proposed solution: add `isLoaded` boolean to Roll entity. A roll can be `status 
 
 **Privacy Policy**
 
-Google Play requires a privacy policy for any app that collects personal data. FRAME//LOG collects GPS coordinates (optional, user-controlled) which qualifies.
+Google Play requires a privacy policy for any app that collects personal data. DETENT collects GPS coordinates (optional, user-controlled) which qualifies.
 
 **Options:**
 
@@ -399,3 +399,4 @@ Android apps using third-party libraries must acknowledge their licenses. Room, 
 **Fallback:** If only one roll is loaded it is automatically active — no selection needed.
 
 ---
+

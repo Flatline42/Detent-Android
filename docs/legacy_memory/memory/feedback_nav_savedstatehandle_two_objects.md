@@ -17,3 +17,6 @@ Writing to one has NO effect on the other.
 - The **sending** screen writes to `navController.previousBackStackEntry?.savedStateHandle?.set(key, value)`
 - The **receiving** screen observes via `navController.currentBackStackEntry?.savedStateHandle?.getStateFlow(key, default)` **in the composable** (e.g., a `LaunchedEffect`), NOT in the ViewModel
 - The ViewModel exposes a regular function (e.g., `loadAndApplyKit(kitId)`) that the composable calls when the value arrives
+
+
+
