@@ -4,7 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.rememberNavController
+import com.southsouthwest.framelog.data.AppPreferences
+import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.ui.navigation.FrameLogNavGraph
 import com.southsouthwest.framelog.ui.theme.DetentTheme
 
@@ -12,8 +17,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        val appPrefs = AppPreferences(this)
+        
         setContent {
-            DetentTheme {
+            val appTheme by appPrefs.appThemeFlow.collectAsState(initial = appPrefs.appTheme)
+            val isDarkTheme = when (appTheme) {
+                AppTheme.LIGHT -> false
+                AppTheme.DARK -> true
+                AppTheme.SYSTEM -> isSystemInDarkTheme()
+            }
+            
+            DetentTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
                 FrameLogNavGraph(navController)
             }

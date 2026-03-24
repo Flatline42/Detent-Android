@@ -202,23 +202,49 @@ class FrameLogWidget : GlanceAppWidget() {
      * by FrameLogWidgetUpdater and by the stepper ActionCallbacks.
      */
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        // Define exact color providers to match the app's High Noon / Golden Hour aesthetic
+        val detentColors = androidx.glance.material3.ColorProviders(
+            light = androidx.compose.material3.lightColorScheme(
+                primary = androidx.compose.ui.graphics.Color(0xFFFF8F00), // Safety Gold
+                background = androidx.compose.ui.graphics.Color(0xFFFAF9F6), // Alpine Background
+                onBackground = androidx.compose.ui.graphics.Color.Black,
+                surface = androidx.compose.ui.graphics.Color.White,
+                onSurface = androidx.compose.ui.graphics.Color.Black,
+                surfaceVariant = androidx.compose.ui.graphics.Color(0xFF121212).copy(alpha = 0.1f),
+                onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFF121212).copy(alpha = 0.7f),
+                error = androidx.compose.ui.graphics.Color(0xFFB00020)
+            ),
+            dark = androidx.compose.material3.darkColorScheme(
+                primary = androidx.compose.ui.graphics.Color(0xFFF7882F), // Burnt Orange
+                background = androidx.compose.ui.graphics.Color(0xFF121212), // Golden Hour Background
+                onBackground = androidx.compose.ui.graphics.Color(0xFFFFCC80), // Warm Cream
+                surface = androidx.compose.ui.graphics.Color(0xFF1E1E1E),
+                onSurface = androidx.compose.ui.graphics.Color(0xFFFFCC80),
+                surfaceVariant = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f),
+                onSurfaceVariant = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f),
+                error = androidx.compose.ui.graphics.Color(0xFFFFCC80) // Long exposure values use this
+            )
+        )
+
         provideContent {
-            val state = currentState<Preferences>()
-            val hasRoll = state[WidgetState.HAS_ROLL] ?: false
+            GlanceTheme(colors = detentColors) {
+                val state = currentState<Preferences>()
+                val hasRoll = state[WidgetState.HAS_ROLL] ?: false
 
-            // Determine which layout variant to render for this pass.
-            val currentSize = LocalSize.current
-            val widgetSize = when {
-                currentSize.width >= SIZE_LOOSE.width &&
-                        currentSize.height >= SIZE_LOOSE.height -> WidgetSize.LOOSE
-                currentSize.height >= SIZE_COMPACT.height -> WidgetSize.COMPACT
-                else -> WidgetSize.STANDARD
-            }
+                // Determine which layout variant to render for this pass.
+                val currentSize = LocalSize.current
+                val widgetSize = when {
+                    currentSize.width >= SIZE_LOOSE.width &&
+                            currentSize.height >= SIZE_LOOSE.height -> WidgetSize.LOOSE
+                    currentSize.height >= SIZE_COMPACT.height -> WidgetSize.COMPACT
+                    else -> WidgetSize.STANDARD
+                }
 
-            if (hasRoll) {
-                ActiveRollContent(state, widgetSize)
-            } else {
-                NoRollContent()
+                if (hasRoll) {
+                    ActiveRollContent(state, widgetSize)
+                } else {
+                    NoRollContent()
+                }
             }
         }
     }

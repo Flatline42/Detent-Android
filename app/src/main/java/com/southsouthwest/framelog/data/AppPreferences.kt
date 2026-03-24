@@ -1,9 +1,15 @@
 package com.southsouthwest.framelog.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 
 private const val PREFS_NAME = "framelog_prefs"
+// ... (rest of the file remains, I will use a more targeted replacement)
 
 // Global keys
 private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
@@ -92,6 +98,18 @@ class AppPreferences(context: Context) {
     var appTheme: AppTheme
         get() = AppTheme.fromKey(prefs.getString(KEY_APP_THEME, AppTheme.SYSTEM.key)!!)
         set(value) = prefs.edit { putString(KEY_APP_THEME, value.key) }
+
+    val appThemeFlow: Flow<AppTheme> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_APP_THEME) {
+                trySend(appTheme)
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        // Emit initial value
+        trySend(appTheme)
+        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
 
     /**
      * When true, color-coded elements (e.g. long-exposure shutter speeds) use a supplementary
