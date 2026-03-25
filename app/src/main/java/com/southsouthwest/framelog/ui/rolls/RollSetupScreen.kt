@@ -71,6 +71,7 @@ import com.southsouthwest.framelog.data.db.entity.CameraBody
 import com.southsouthwest.framelog.data.db.entity.FilmStock
 import com.southsouthwest.framelog.data.db.entity.Lens
 import com.southsouthwest.framelog.ui.navigation.KitSelector
+import com.southsouthwest.framelog.ui.navigation.QuickScreen
 import com.southsouthwest.framelog.ui.navigation.RollJournal
 import com.southsouthwest.framelog.ui.navigation.RollSetup
 import java.text.SimpleDateFormat
@@ -111,8 +112,7 @@ fun RollSetupScreen(navController: NavHostController) {
                         popUpTo<RollSetup> { inclusive = true }
                     }
                 is RollSetupEvent.RollCreatedAndLoaded ->
-                    // TODO: navigate to QuickScreen once implemented
-                    navController.navigate(RollJournal(event.rollId)) {
+                    navController.navigate(QuickScreen) {
                         popUpTo<RollSetup> { inclusive = true }
                     }
                 is RollSetupEvent.ShowErrorMessage ->

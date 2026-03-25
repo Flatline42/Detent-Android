@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -71,21 +72,19 @@ class CameraBodyDetailViewModel(
     }
 
     private fun loadExistingBody() = viewModelScope.launch {
-        gearRepository.getCameraBodyById(bodyId).collect { body ->
-            _state.update {
-                it.copy(
-                    name = body.name,
-                    make = body.make,
-                    model = body.model,
-                    mountType = body.mountType,
-                    format = body.format,
-                    shutterIncrements = body.shutterIncrements,
-                    notes = body.notes ?: "",
-                    isLoading = false,
-                    isDirty = false,
-                )
-            }
-            return@collect
+        val body = gearRepository.getCameraBodyById(bodyId).first()
+        _state.update {
+            it.copy(
+                name = body.name,
+                make = body.make,
+                model = body.model,
+                mountType = body.mountType,
+                format = body.format,
+                shutterIncrements = body.shutterIncrements,
+                notes = body.notes ?: "",
+                isLoading = false,
+                isDirty = false,
+            )
         }
     }
 

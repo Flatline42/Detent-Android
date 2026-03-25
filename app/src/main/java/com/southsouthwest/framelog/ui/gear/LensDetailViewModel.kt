@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -95,26 +96,23 @@ class LensDetailViewModel(
     }
 
     private fun loadExistingLens() = viewModelScope.launch {
-        // take(1): populate form once from DB, then leave it editable without
-        // subsequent DB updates overwriting the user's in-progress edits.
-        gearRepository.getLensById(lensId).collect { lens ->
-            _state.update {
-                it.copy(
-                    name = lens.name,
-                    make = lens.make,
-                    focalLengthMm = lens.focalLengthMm.toString(),
-                    mountType = lens.mountType,
-                    maxAperture = lens.maxAperture.toString(),
-                    minAperture = lens.minAperture.toString(),
-                    apertureIncrements = lens.apertureIncrements,
-                    filterSizeMm = lens.filterSizeMm?.toString() ?: "",
-                    notes = lens.notes ?: "",
-                    isLoading = false,
-                    isDirty = false,
-                )
-            }
-            // Stop collecting after the first value
-            return@collect
+        // first() terminates after a single emission — form is populated once from DB,
+        // then left editable without reactive updates overwriting in-progress edits.
+        val lens = gearRepository.getLensById(lensId).first()
+        _state.update {
+            it.copy(
+                name = lens.name,
+                make = lens.make,
+                focalLengthMm = lens.focalLengthMm.toString(),
+                mountType = lens.mountType,
+                maxAperture = lens.maxAperture.toString(),
+                minAperture = lens.minAperture.toString(),
+                apertureIncrements = lens.apertureIncrements,
+                filterSizeMm = lens.filterSizeMm?.toString() ?: "",
+                notes = lens.notes ?: "",
+                isLoading = false,
+                isDirty = false,
+            )
         }
     }
 

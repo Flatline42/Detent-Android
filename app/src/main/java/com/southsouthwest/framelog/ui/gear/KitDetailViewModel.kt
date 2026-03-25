@@ -108,27 +108,25 @@ class KitDetailViewModel(
     }
 
     private fun loadExistingKit() = viewModelScope.launch {
-        kitRepository.getKitWithDetails(kitId).collect { kitWithDetails ->
-            val lensRows = kitWithDetails.lenses.map { kl ->
-                KitLensRow(lens = kl.lens, isPrimary = kl.kitLens.isPrimary)
-            }
-            // Load available lenses for this kit's mount type
-            val mountType = kitWithDetails.cameraBody.mountType
-            val compatibleLenses = gearRepository.getLensesByMountType(mountType).first()
+        val kitWithDetails = kitRepository.getKitWithDetails(kitId).first()
+        val lensRows = kitWithDetails.lenses.map { kl ->
+            KitLensRow(lens = kl.lens, isPrimary = kl.kitLens.isPrimary)
+        }
+        // Load available lenses for this kit's mount type
+        val mountType = kitWithDetails.cameraBody.mountType
+        val compatibleLenses = gearRepository.getLensesByMountType(mountType).first()
 
-            _state.update {
-                it.copy(
-                    name = kitWithDetails.kit.name,
-                    cameraBody = kitWithDetails.cameraBody,
-                    lenses = lensRows,
-                    filters = kitWithDetails.filters.map { kf -> kf.filter },
-                    notes = kitWithDetails.kit.notes ?: "",
-                    availableLenses = compatibleLenses,
-                    isLoading = false,
-                    isDirty = false,
-                )
-            }
-            return@collect
+        _state.update {
+            it.copy(
+                name = kitWithDetails.kit.name,
+                cameraBody = kitWithDetails.cameraBody,
+                lenses = lensRows,
+                filters = kitWithDetails.filters.map { kf -> kf.filter },
+                notes = kitWithDetails.kit.notes ?: "",
+                availableLenses = compatibleLenses,
+                isLoading = false,
+                isDirty = false,
+            )
         }
     }
 

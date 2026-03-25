@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,20 +70,18 @@ class FilterDetailViewModel(
     }
 
     private fun loadExistingFilter() = viewModelScope.launch {
-        gearRepository.getFilterById(filterId).collect { filter ->
-            _state.update {
-                it.copy(
-                    name = filter.name,
-                    make = filter.make,
-                    filterType = filter.filterType,
-                    evReduction = filter.evReduction?.toString() ?: "",
-                    filterSizeMm = filter.filterSizeMm?.toString() ?: "",
-                    notes = filter.notes ?: "",
-                    isLoading = false,
-                    isDirty = false,
-                )
-            }
-            return@collect
+        val filter = gearRepository.getFilterById(filterId).first()
+        _state.update {
+            it.copy(
+                name = filter.name,
+                make = filter.make,
+                filterType = filter.filterType,
+                evReduction = filter.evReduction?.toString() ?: "",
+                filterSizeMm = filter.filterSizeMm?.toString() ?: "",
+                notes = filter.notes ?: "",
+                isLoading = false,
+                isDirty = false,
+            )
         }
     }
 

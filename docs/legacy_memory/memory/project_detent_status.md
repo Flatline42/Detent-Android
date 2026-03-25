@@ -184,6 +184,11 @@ RollSetupViewModel, RollJournalViewModel, FrameDetailViewModel, QuickScreenViewM
 
 **Not yet started (needs user go-ahead first):**
 - Onboarding screens (Welcome, coach marks)
+- **To-Do List:**
+  - Create the necessary privacy policy documentation and host it.
+  - Create the necessary open-source licensing documentation.
+  - Perform a final comprehensive pass/review after onboarding is complete.
+  - Associate the "tip jar" option in Settings with the actual tip jar link/setup (to be provided manually).
 
 ---
 

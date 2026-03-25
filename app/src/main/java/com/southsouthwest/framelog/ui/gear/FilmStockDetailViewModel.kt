@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,22 +65,20 @@ class FilmStockDetailViewModel(
     }
 
     private fun loadExistingFilmStock() = viewModelScope.launch {
-        gearRepository.getFilmStockById(filmStockId).collect { stock ->
-            _state.update {
-                it.copy(
-                    name = stock.name,
-                    make = stock.make,
-                    iso = stock.iso.toString(),
-                    format = stock.format,
-                    defaultFrameCount = stock.defaultFrameCount.toString(),
-                    colorType = stock.colorType,
-                    discontinued = stock.discontinued,
-                    notes = stock.notes ?: "",
-                    isLoading = false,
-                    isDirty = false,
-                )
-            }
-            return@collect
+        val stock = gearRepository.getFilmStockById(filmStockId).first()
+        _state.update {
+            it.copy(
+                name = stock.name,
+                make = stock.make,
+                iso = stock.iso.toString(),
+                format = stock.format,
+                defaultFrameCount = stock.defaultFrameCount.toString(),
+                colorType = stock.colorType,
+                discontinued = stock.discontinued,
+                notes = stock.notes ?: "",
+                isLoading = false,
+                isDirty = false,
+            )
         }
     }
 
