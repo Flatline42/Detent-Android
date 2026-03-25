@@ -211,6 +211,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         _events.send(SettingsEvent.OpenTipJar)
     }
 
+    /** Debug helper — resets the tip nag flag so the prompt can be triggered again. */
+    fun onResetTipNagFlag() {
+        appPreferences.tipJarPromptShown = false
+    }
+
     fun onOssLicensesTapped() = viewModelScope.launch {
         _events.send(SettingsEvent.OpenOssLicenses)
     }

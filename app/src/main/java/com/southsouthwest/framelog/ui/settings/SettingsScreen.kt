@@ -244,10 +244,12 @@ fun SettingsScreen(navController: NavHostController) {
             item {
                 SettingsRow(
                     label = "Accessible color mode",
+                    sublabel = "coming soon",
                     trailing = {
                         Switch(
                             checked = state.accessibleColorMode,
                             onCheckedChange = viewModel::onAccessibleColorModeChanged,
+                            enabled = false,
                         )
                     },
                 )
@@ -325,6 +327,16 @@ fun SettingsScreen(navController: NavHostController) {
             item { SettingsSectionHeader("SUPPORT") }
 
             item { SupportRow(onTipJarTapped = viewModel::onTipJarTapped) }
+
+            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
+
+            // Debug: reset tip nag flag so the prompt can fire again during testing
+            item {
+                SettingsRow(
+                    label = "Reset tip nag flag (debug)",
+                    onClick = viewModel::onResetTipNagFlag,
+                )
+            }
 
             item { HorizontalDivider() }
 
@@ -622,6 +634,7 @@ fun SettingsScreen(navController: NavHostController) {
 private fun SettingsRow(
     label: String,
     modifier: Modifier = Modifier,
+    sublabel: String? = null,
     onClick: (() -> Unit)? = null,
     value: String? = null,
     trailing: (@Composable () -> Unit)? = null,
@@ -633,11 +646,19 @@ private fun SettingsRow(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f),
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            if (sublabel != null) {
+                Text(
+                    text = sublabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         when {
             trailing != null -> trailing()
             value != null && onClick != null -> Text(
