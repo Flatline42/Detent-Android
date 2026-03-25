@@ -78,6 +78,9 @@ import com.southsouthwest.framelog.data.db.entity.RollStatus
 import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.ui.navigation.RollJournal
 import com.southsouthwest.framelog.ui.navigation.RollSetup
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -99,12 +102,14 @@ fun RollListScreen(
         ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // Pending confirmation dialogs — managed locally since confirmation happens before VM call
     var pendingLoadRoll by remember { mutableStateOf<Roll?>(null) }
     var pendingDeleteRoll by remember { mutableStateOf<Roll?>(null) }
     var pendingArchiveRoll by remember { mutableStateOf<Roll?>(null) }
     var pendingUnarchiveRoll by remember { mutableStateOf<Roll?>(null) }
+    var showTipNagDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -119,6 +124,8 @@ fun RollListScreen(
                     pendingDeleteRoll = event.roll
                 is RollListEvent.ShowErrorMessage ->
                     scope.launch { snackbarHostState.showSnackbar(event.message) }
+                is RollListEvent.ShowTipNagPrompt ->
+                    showTipNagDialog = true
             }
         }
     }
@@ -295,6 +302,50 @@ fun RollListScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingUnarchiveRoll = null }) { Text("Cancel") }
+            },
+        )
+    }
+
+    if (showTipNagDialog) {
+        AlertDialog(
+            onDismissRequest = { showTipNagDialog = false },
+            title = { Text("Enjoying DETENT?") },
+            text = {
+                Text(
+                    "You've finished ${state.finishedRolls.size + state.archivedRolls.size} rolls — " +
+                        "that's a lot of film! If DETENT has been useful, a small tip goes a long way."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        vm.onTipNagAccepted()
+                        showTipNagDialog = false
+                        // TODO: replace with your Ko-fi page URL before release
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com"))
+                        context.startActivity(intent)
+                    },
+                ) {
+                    Text("Sure!")
+                }
+            },
+            dismissButton = {
+                // Two dismiss options: "Maybe later" (no flag) and "No thanks" (sets flag)
+                // Rendered as a Row since AlertDialog only accepts one dismissButton slot.
+                // We override onDismissRequest to handle back-press / outside tap as "maybe later".
+                androidx.compose.foundation.layout.Row {
+                    TextButton(
+                        onClick = {
+                            vm.onTipNagDeclined()
+                            showTipNagDialog = false
+                        },
+                    ) {
+                        Text("No thanks")
+                    }
+                    TextButton(onClick = { showTipNagDialog = false }) {
+                        Text("Maybe later")
+                    }
+                }
             },
         )
     }
