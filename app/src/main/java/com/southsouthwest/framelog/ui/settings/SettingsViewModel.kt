@@ -61,6 +61,8 @@ sealed class SettingsEvent {
     data object NavigateToOnboarding : SettingsEvent()
     /** Navigate to Widget Setup Instructions screen. */
     data object NavigateToWidgetSetup : SettingsEvent()
+    /** Database reset completed — the app must restart to initialise a fresh database. */
+    data object ResetCompleteRestartRequired : SettingsEvent()
     data class ShowErrorMessage(val message: String) : SettingsEvent()
     data class ShowInfoMessage(val message: String) : SettingsEvent()
 }
@@ -173,6 +175,25 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    /**
+     * Wipes the entire Room database by deleting all three database files.
+     * SharedPreferences (settings, active roll ID, onboarding flag) are untouched.
+     *
+     * Room must be closed before the files are deleted. After deletion Room will
+     * create a fresh empty database on next access, so the app must restart.
+     */
+    fun onResetDatabaseConfirmed() = viewModelScope.launch {
+        try {
+            val app = getApplication<Application>()
+            withContext(Dispatchers.IO) {
+                resetDatabase(app)
+            }
+            _events.send(SettingsEvent.ResetCompleteRestartRequired)
+        } catch (e: Exception) {
+            _events.send(SettingsEvent.ShowErrorMessage("Reset failed: ${e.message}"))
+        }
+    }
+
     // ---------------------------------------------------------------------------
     // Navigation shortcuts
     // ---------------------------------------------------------------------------
@@ -248,6 +269,25 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         backupFile.copyTo(dbFile, overwrite = true)
 
         // Also remove WAL and SHM files if present to avoid stale state
+        File("${dbFile.absolutePath}-wal").delete()
+        File("${dbFile.absolutePath}-shm").delete()
+    }
+
+    /**
+     * Deletes all three Room database files, producing a clean slate.
+     * SharedPreferences are not touched.
+     *
+     * Room reopens lazily on next access and creates a fresh empty database.
+     * The app must restart so that all in-memory state (active roll ID, etc.)
+     * is re-evaluated against the now-empty database.
+     */
+    private fun resetDatabase(context: Context) {
+        val dbFile = context.getDatabasePath("detent.db")
+
+        // Close the Room singleton before deleting — same pattern as backup/restore
+        AppDatabase.closeInstance()
+
+        dbFile.delete()
         File("${dbFile.absolutePath}-wal").delete()
         File("${dbFile.absolutePath}-shm").delete()
     }

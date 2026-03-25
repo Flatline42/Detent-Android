@@ -111,6 +111,10 @@ fun SettingsScreen(navController: NavHostController) {
     var showRestoreConfirmDialog by remember { mutableStateOf(false) }
     var showRestartDialog by remember { mutableStateOf(false) }
 
+    var showResetStage1Dialog by remember { mutableStateOf(false) }
+    var showResetStage2Dialog by remember { mutableStateOf(false) }
+    var showResetRestartDialog by remember { mutableStateOf(false) }
+
     // ── File picker for backup restore ────────────────────────────────────
     val filePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent(),
@@ -143,6 +147,10 @@ fun SettingsScreen(navController: NavHostController) {
 
                 is SettingsEvent.RestoreCompleteRestartRequired -> {
                     showRestartDialog = true
+                }
+
+                is SettingsEvent.ResetCompleteRestartRequired -> {
+                    showResetRestartDialog = true
                 }
 
                 is SettingsEvent.OpenTipJar -> {
@@ -277,6 +285,13 @@ fun SettingsScreen(navController: NavHostController) {
                             )
                         }
                     } else null,
+                )
+            }
+            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
+            item {
+                DangerSettingsRow(
+                    label = "Reset database",
+                    onClick = { showResetStage1Dialog = true },
                 )
             }
 
@@ -501,7 +516,7 @@ fun SettingsScreen(navController: NavHostController) {
         )
     }
 
-    // ── Restart required dialog ────────────────────────────────────────────
+    // ── Restart required dialog (restore) ─────────────────────────────────
     if (showRestartDialog) {
         AlertDialog(
             onDismissRequest = { showRestartDialog = false },
@@ -517,6 +532,76 @@ fun SettingsScreen(navController: NavHostController) {
             },
             dismissButton = {
                 TextButton(onClick = { showRestartDialog = false }) { Text("Later") }
+            },
+        )
+    }
+
+    // ── Reset database — stage 1 ───────────────────────────────────────────
+    if (showResetStage1Dialog) {
+        AlertDialog(
+            onDismissRequest = { showResetStage1Dialog = false },
+            title = { Text("Reset database?") },
+            text = {
+                Text("This will permanently delete all rolls, frames, and gear. This cannot be undone unless you have a backup.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetStage1Dialog = false
+                        showResetStage2Dialog = true
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) { Text("Continue") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetStage1Dialog = false }) { Text("Cancel") }
+            },
+        )
+    }
+
+    // ── Reset database — stage 2 (final confirmation) ─────────────────────
+    if (showResetStage2Dialog) {
+        AlertDialog(
+            onDismissRequest = { showResetStage2Dialog = false },
+            title = { Text("This cannot be undone.") },
+            text = {
+                Text("You are about to wipe the entire database. Every roll, frame, lens, camera body, filter, film stock, and kit will be deleted. Settings are preserved. There is no recovery without a backup.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetStage2Dialog = false
+                        viewModel.onResetDatabaseConfirmed()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) { Text("Reset now") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetStage2Dialog = false }) { Text("Cancel") }
+            },
+        )
+    }
+
+    // ── Restart required dialog (reset) ───────────────────────────────────
+    if (showResetRestartDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetRestartDialog = false },
+            title = { Text("Database reset") },
+            text = { Text("The database has been wiped. Restart DETENT to begin fresh.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetRestartDialog = false
+                        restartApp(context)
+                    },
+                ) { Text("Restart now") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetRestartDialog = false }) { Text("Later") }
             },
         )
     }
@@ -571,6 +656,31 @@ private fun SettingsRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+/**
+ * A settings row styled as a danger action — label in error color, no chevron.
+ * Used for irreversible operations like "Reset database".
+ */
+@Composable
+private fun DangerSettingsRow(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error,
+        )
     }
 }
 
