@@ -126,7 +126,8 @@ enum class OnboardingStep(
         stepNumber = 7,
         title = "Load your first roll",
         body = "Tap + to set up a new roll. Select your film stock, camera body, and lenses. " +
-            "Then tap 'Create & Load' to load the film and start logging.",
+            "Make sure to tap \u2018Create & Load\u2019 \u2014 not just \u2018Create Roll\u2019 " +
+            "\u2014 to load the film and start logging.",
         spotlightCenterXFraction = 0.87f,
         spotlightCenterYFraction = 0.84f,
         spotlightWidthFraction = 0.20f,

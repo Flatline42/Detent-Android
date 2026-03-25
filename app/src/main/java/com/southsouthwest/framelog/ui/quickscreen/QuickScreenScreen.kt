@@ -272,14 +272,8 @@ fun QuickScreenScreen(
                     ) {
                         Spacer(modifier = Modifier.weight(1f))
 
-                        // Frame pointer stepper
-                        Box(
-                            modifier = Modifier.onGloballyPositioned { coords ->
-                                if (onboardingStep == OnboardingStep.QS_FRAME) {
-                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
-                                }
-                            },
-                        ) {
+                        // Frame pointer stepper — tag applied directly to the stepper so
+                        // boundsInWindow() captures the stepper's own layout node, not a wrapper.
                         SmallStepper(
                             label = "frame pointer",
                             displayText = "${state.currentFrameNumber} / ${activeRoll.frames.size}",
@@ -291,9 +285,18 @@ fun QuickScreenScreen(
                             onIncrement = {
                                 viewModel.onFramePointerChanged(state.currentFrameNumber + 1)
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(
+                                    if (onboardingStep == OnboardingStep.QS_FRAME) {
+                                        Modifier.onGloballyPositioned { coords ->
+                                            onboardingViewModel?.updateSpotlightBounds(
+                                                coords.boundsInWindow(),
+                                            )
+                                        }
+                                    } else Modifier,
+                                ),
                         )
-                        }
 
                         // Off-frontier indicator — shown when the user has manually navigated
                         // away from the next expected unlogged frame.
@@ -329,47 +332,51 @@ fun QuickScreenScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                        // Lens selector
+                        // Lens selector — tag applied directly so bounds match the row itself.
                         val selectedLens = rollLenses
                             .firstOrNull { it.lens.id == state.selectedLensId }?.lens
                             ?: rollLenses.firstOrNull()?.lens
-                        Box(
-                            modifier = Modifier.onGloballyPositioned { coords ->
-                                if (onboardingStep == OnboardingStep.QS_LENS) {
-                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
-                                }
-                            },
-                        ) {
-                            LensRow(
-                                lensName = selectedLens?.name,
-                                hasMultipleLenses = rollLenses.size > 1,
-                                onCycleLens = viewModel::onLensCycleTapped,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                            )
-                        }
+                        LensRow(
+                            lensName = selectedLens?.name,
+                            hasMultipleLenses = rollLenses.size > 1,
+                            onCycleLens = viewModel::onLensCycleTapped,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .then(
+                                    if (onboardingStep == OnboardingStep.QS_LENS) {
+                                        Modifier.onGloballyPositioned { coords ->
+                                            onboardingViewModel?.updateSpotlightBounds(
+                                                coords.boundsInWindow(),
+                                            )
+                                        }
+                                    } else Modifier,
+                                ),
+                        )
 
                         Spacer(Modifier.height(8.dp))
 
-                        // Filter chips + EV sum
-                        Box(
-                            modifier = Modifier.onGloballyPositioned { coords ->
-                                if (onboardingStep == OnboardingStep.QS_FILTERS) {
-                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
-                                }
-                            },
-                        ) {
-                            FilterChipsRow(
-                                displayedFilters = displayedFilters,
-                                activeFilterIds = state.activeFilterIds,
-                                hasMoreFilters = hasMoreFilters || rollFilters.isNotEmpty(),
-                                filterEvSum = filterEvSum,
-                                filterHasNullEv = filterHasNullEv,
-                                activeCount = activeFilterObjs.size,
-                                onFilterToggled = viewModel::onFilterToggled,
-                                onOpenPicker = { showFilterPicker = true },
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                            )
-                        }
+                        // Filter chips + EV sum — tag applied directly so bounds match the row.
+                        FilterChipsRow(
+                            displayedFilters = displayedFilters,
+                            activeFilterIds = state.activeFilterIds,
+                            hasMoreFilters = hasMoreFilters || rollFilters.isNotEmpty(),
+                            filterEvSum = filterEvSum,
+                            filterHasNullEv = filterHasNullEv,
+                            activeCount = activeFilterObjs.size,
+                            onFilterToggled = viewModel::onFilterToggled,
+                            onOpenPicker = { showFilterPicker = true },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .then(
+                                    if (onboardingStep == OnboardingStep.QS_FILTERS) {
+                                        Modifier.onGloballyPositioned { coords ->
+                                            onboardingViewModel?.updateSpotlightBounds(
+                                                coords.boundsInWindow(),
+                                            )
+                                        }
+                                    } else Modifier,
+                                ),
+                        )
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -399,13 +406,19 @@ fun QuickScreenScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                        // Aperture + shutter steppers — wrapped together for QS_STEPPERS spotlight
+                        // Aperture + shutter steppers — wrapped together for QS_STEPPERS spotlight.
+                        // fillMaxWidth() ensures the tracked bounds span the full screen width so
+                        // the spotlight oval covers both steppers including their +/- buttons.
                         Column(
-                            modifier = Modifier.onGloballyPositioned { coords ->
-                                if (onboardingStep == OnboardingStep.QS_STEPPERS) {
-                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
-                                }
-                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onGloballyPositioned { coords ->
+                                    if (onboardingStep == OnboardingStep.QS_STEPPERS) {
+                                        onboardingViewModel?.updateSpotlightBounds(
+                                            coords.boundsInWindow(),
+                                        )
+                                    }
+                                },
                         ) {
                         // Aperture — + = wider (lower index), − = narrower (higher index)
                         LargeStepper(
@@ -499,30 +512,41 @@ fun QuickScreenScreen(
                     HorizontalDivider()
 
                     // ── Log Frame button — anchored to bottom ──────────────
-                    Button(
-                        onClick = { triggerLogFrame() },
+                    // The spotlight is measured on the outer Box so the bounds include
+                    // the surrounding padding, centering the oval on the visible button.
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .height(64.dp)
-                            .onGloballyPositioned { coords ->
+                            .then(
                                 if (onboardingStep == OnboardingStep.QS_LOG_FRAME) {
-                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
-                                }
-                            },
-                        enabled = !state.isLoggingFrame,
+                                    Modifier.onGloballyPositioned { coords ->
+                                        onboardingViewModel?.updateSpotlightBounds(
+                                            coords.boundsInWindow(),
+                                        )
+                                    }
+                                } else Modifier,
+                            ),
                     ) {
-                        if (state.isLoggingFrame) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.dp,
-                            )
-                        } else {
-                            Text(
-                                text = "log frame",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
+                        Button(
+                            onClick = { triggerLogFrame() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .height(64.dp),
+                            enabled = !state.isLoggingFrame,
+                        ) {
+                            if (state.isLoggingFrame) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Text(
+                                    text = "log frame",
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
                         }
                     }
                 }

@@ -79,6 +79,33 @@ fun GearLibraryScreen(
     val onboardingStep by (onboardingViewModel?.step?.collectAsState()
         ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
 
+    // When the onboarding step changes, switch to the tab that the coach mark is spotlighting.
+    // This handles both the case where the user returns from a detail screen (tab resets to
+    // whatever it was before) and the case where the step advances while already on this screen.
+    LaunchedEffect(onboardingStep) {
+        when (onboardingStep) {
+            OnboardingStep.ADD_LENS -> vm.onTabSelected(GearTab.LENSES)
+            OnboardingStep.ADD_BODY -> vm.onTabSelected(GearTab.BODIES)
+            OnboardingStep.FILTERS_TOUR -> vm.onTabSelected(GearTab.FILTERS)
+            OnboardingStep.ADD_FILM_STOCK -> vm.onTabSelected(GearTab.FILM_STOCKS)
+            OnboardingStep.KITS_TOUR -> vm.onTabSelected(GearTab.KITS)
+            else -> {}
+        }
+    }
+
+    // The tab that the current onboarding step expects to be visible. FAB spotlight bounds
+    // are only reported when this tab is actually selected, preventing a stale position
+    // from a previously-visible tab from being sent to the overlay.
+    val expectedTabForStep = remember(onboardingStep) {
+        when (onboardingStep) {
+            OnboardingStep.ADD_LENS -> GearTab.LENSES
+            OnboardingStep.ADD_BODY -> GearTab.BODIES
+            OnboardingStep.ADD_FILM_STOCK -> GearTab.FILM_STOCKS
+            OnboardingStep.KITS_TOUR -> GearTab.KITS
+            else -> null
+        }
+    }
+
     // Translate ViewModel events to navigation actions
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -114,7 +141,9 @@ fun GearLibraryScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 modifier = Modifier.onGloballyPositioned { coords ->
-                    if (onboardingStep in gearFabSteps) {
+                    // Only report bounds when the correct tab is actually visible —
+                    // prevents a mismatched FAB label from being spotlighted.
+                    if (onboardingStep in gearFabSteps && state.selectedTab == expectedTabForStep) {
                         onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
                     }
                 },

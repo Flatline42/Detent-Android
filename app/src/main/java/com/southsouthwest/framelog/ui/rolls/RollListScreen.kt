@@ -123,6 +123,14 @@ fun RollListScreen(
         }
     }
 
+    // Auto-select the Finished tab when onboarding reaches FINISHED_ROLLS_TOUR so the
+    // coach card and spotlight appear on the correct tab immediately after navigation.
+    LaunchedEffect(onboardingStep) {
+        if (onboardingStep == OnboardingStep.FINISHED_ROLLS_TOUR) {
+            vm.onTabSelected(RollListTab.FINISHED)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Rolls") })

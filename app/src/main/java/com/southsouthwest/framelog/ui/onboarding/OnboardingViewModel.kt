@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
+ * Which bottom navigation tab should receive the onboarding highlight ring.
+ * Null-mapped steps (WELCOME, WIDGET_SETUP_SCREEN, COMPLETE) produce no highlight.
+ */
+enum class OnboardingNavTab { GEAR, ROLLS, QUICK, JOURNAL, SETTINGS }
+
+/**
  * ViewModel that owns onboarding progression state.
  *
  * Lives at the NavGraph level (created in MainActivity and passed down) so it persists

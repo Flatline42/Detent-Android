@@ -180,7 +180,26 @@ fun OnboardingCoachOverlay(
         }
 
         // ── Coach card + directional arrow ────────────────────────────────────
-        if (isSpotlightInBottomHalf) {
+        //
+        // Gear Library FAB steps (ADD_LENS/ADD_BODY/ADD_FILM_STOCK/KITS_TOUR): the FAB is in
+        // the bottom-right corner while the tab row is at the top. The normal top/bottom card
+        // placement logic would put the card at the top (covering the tab row) or bottom
+        // (covering the FAB). Instead, force the card to vertical center so both the tab row
+        // above and the FAB below remain visible through the scrim simultaneously.
+        if (isCenteredCardStep(step)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CoachCard(
+                    step = step,
+                    onGotIt = onGotIt,
+                    onSkip = onSkip,
+                )
+            }
+        } else if (isSpotlightInBottomHalf) {
             // Spotlight is in the bottom half — card goes at the top of the screen.
             Column(
                 modifier = Modifier
@@ -237,6 +256,19 @@ private fun isGearLibraryStep(step: OnboardingStep): Boolean = step in setOf(
     OnboardingStep.FILTERS_TOUR,
     OnboardingStep.ADD_FILM_STOCK,
     OnboardingStep.KITS_TOUR,
+)
+
+/**
+ * Steps where the spotlight targets a FAB in the bottom-right corner and the coach card
+ * should be centered vertically so both the screen content above and the FAB below remain
+ * visible through the scrim simultaneously.
+ */
+private fun isCenteredCardStep(step: OnboardingStep): Boolean = step in setOf(
+    OnboardingStep.ADD_LENS,
+    OnboardingStep.ADD_BODY,
+    OnboardingStep.ADD_FILM_STOCK,
+    OnboardingStep.KITS_TOUR,
+    OnboardingStep.CREATE_ROLL,
 )
 
 // ---------------------------------------------------------------------------

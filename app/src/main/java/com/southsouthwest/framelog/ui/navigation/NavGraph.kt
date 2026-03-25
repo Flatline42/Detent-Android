@@ -1,10 +1,13 @@
 package com.southsouthwest.framelog.ui.navigation
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Create
@@ -20,9 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
@@ -40,6 +47,7 @@ import com.southsouthwest.framelog.ui.gear.GearLibraryScreen
 import com.southsouthwest.framelog.ui.gear.KitDetailScreen
 import com.southsouthwest.framelog.ui.gear.LensDetailScreen
 import com.southsouthwest.framelog.ui.onboarding.OnboardingCoachOverlay
+import com.southsouthwest.framelog.ui.onboarding.OnboardingNavTab
 import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
 import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.southsouthwest.framelog.ui.onboarding.WelcomeScreen
@@ -136,6 +144,31 @@ fun FrameLogNavGraph(
                     launchSingleTop = true
                 }
             }
+            // Steps 9a–9f all live on Quick Screen. Navigate there if not already present.
+            // This fires when ROLL_JOURNAL_TOUR advances into QS_HEADER, and also guards
+            // against any edge-case re-entry from other destinations mid-flow.
+            OnboardingStep.QS_HEADER,
+            OnboardingStep.QS_LENS,
+            OnboardingStep.QS_FILTERS,
+            OnboardingStep.QS_STEPPERS,
+            OnboardingStep.QS_FRAME,
+            OnboardingStep.QS_LOG_FRAME -> {
+                if (navController.currentDestination?.hasRoute<QuickScreen>() != true) {
+                    navController.navigate(QuickScreen) {
+                        launchSingleTop = true
+                    }
+                }
+            }
+            // Step 10 — Finished Rolls Tour must show on the Roll List screen.
+            // Navigate there if not already present; RollListScreen's own LaunchedEffect
+            // will then select the Finished tab automatically.
+            OnboardingStep.FINISHED_ROLLS_TOUR -> {
+                if (navController.currentDestination?.hasRoute<RollList>() != true) {
+                    navController.navigate(RollList) {
+                        launchSingleTop = true
+                    }
+                }
+            }
             else -> {
                 // Other step transitions do not require automatic navigation here.
             }
@@ -169,6 +202,7 @@ fun FrameLogNavGraph(
                 FrameLogNavigationBar(
                     navController = navController,
                     currentDestination = currentDestination,
+                    onboardingViewModel = onboardingViewModel,
                 )
             }
         },
@@ -398,13 +432,29 @@ fun FrameLogNavGraph(
 private fun FrameLogNavigationBar(
     navController: NavHostController,
     currentDestination: NavDestination?,
+    onboardingViewModel: OnboardingViewModel,
 ) {
     val context = LocalContext.current
+
+    // Derive the nav tab that should receive an onboarding highlight ring from the current step.
+    // Returns null when onboarding is not active or the current step has no nav-tab mapping.
+    val onboardingStep by onboardingViewModel.step.collectAsState()
+    val navHighlight: OnboardingNavTab? = when (onboardingStep) {
+        OnboardingStep.ADD_LENS, OnboardingStep.ADD_BODY, OnboardingStep.FILTERS_TOUR,
+        OnboardingStep.ADD_FILM_STOCK, OnboardingStep.KITS_TOUR -> OnboardingNavTab.GEAR
+        OnboardingStep.CREATE_ROLL,
+        OnboardingStep.FINISHED_ROLLS_TOUR -> OnboardingNavTab.ROLLS
+        OnboardingStep.ROLL_JOURNAL_TOUR -> OnboardingNavTab.JOURNAL
+        OnboardingStep.QS_HEADER, OnboardingStep.QS_LENS, OnboardingStep.QS_FILTERS,
+        OnboardingStep.QS_STEPPERS, OnboardingStep.QS_FRAME,
+        OnboardingStep.QS_LOG_FRAME -> OnboardingNavTab.QUICK
+        else -> null
+    }
 
     NavigationBar {
         // 1 — Gear Library
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Build, contentDescription = null) },
+            icon = { NavIcon(Icons.Default.Build, navHighlight == OnboardingNavTab.GEAR) },
             label = { Text("Gear") },
             selected = currentDestination?.hasRoute<GearLibrary>() ?: false,
             onClick = {
@@ -418,7 +468,7 @@ private fun FrameLogNavigationBar(
 
         // 2 — Roll List
         NavigationBarItem(
-            icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
+            icon = { NavIcon(Icons.AutoMirrored.Filled.List, navHighlight == OnboardingNavTab.ROLLS) },
             label = { Text("Rolls") },
             selected = currentDestination?.hasRoute<RollList>() ?: false,
             onClick = {
@@ -433,7 +483,7 @@ private fun FrameLogNavigationBar(
 
         // 3 — Quick Screen (center / home)
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = null) },
+            icon = { NavIcon(Icons.Default.Home, navHighlight == OnboardingNavTab.QUICK) },
             label = { Text("Quick") },
             selected = currentDestination?.hasRoute<QuickScreen>() ?: false,
             onClick = {
@@ -446,7 +496,7 @@ private fun FrameLogNavigationBar(
 
         // 4 — Active Roll Journal
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Create, contentDescription = null) },
+            icon = { NavIcon(Icons.Default.Create, navHighlight == OnboardingNavTab.JOURNAL) },
             label = { Text("Journal") },
             selected = currentDestination?.hasRoute<RollJournal>() ?: false,
             onClick = {
@@ -470,7 +520,7 @@ private fun FrameLogNavigationBar(
 
         // 5 — Settings
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            icon = { NavIcon(Icons.Default.Settings, navHighlight == OnboardingNavTab.SETTINGS) },
             label = { Text("Settings") },
             selected = currentDestination?.hasRoute<Settings>() ?: false,
             onClick = {
@@ -481,5 +531,36 @@ private fun FrameLogNavigationBar(
                 }
             },
         )
+    }
+}
+
+/**
+ * Nav bar icon with an optional onboarding highlight ring.
+ *
+ * When [highlighted] is true, a white circular stroke is drawn around the icon using an
+ * overlay Box — matching the spotlight cutout style used for other onboarding targets.
+ * The ring is additive: the existing Material3 active-tab indicator is unchanged.
+ *
+ * @param imageVector The icon to display.
+ * @param highlighted Whether to draw the white ring. Only true for the one tab that
+ *   corresponds to the current onboarding step.
+ */
+@Composable
+private fun NavIcon(
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
+    highlighted: Boolean,
+) {
+    Box(contentAlignment = Alignment.Center) {
+        Icon(imageVector, contentDescription = null)
+        if (highlighted) {
+            // Overlay a 36 dp circle with a 2 dp white stroke — same stroke weight as the
+            // spotlight ring in OnboardingCoachOverlay. Sized to give ~6 dp clearance around
+            // the standard 24 dp nav icon.
+            Box(
+                Modifier
+                    .size(36.dp)
+                    .border(2.dp, Color.White, CircleShape),
+            )
+        }
     }
 }
