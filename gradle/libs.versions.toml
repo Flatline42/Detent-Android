@@ -16,6 +16,7 @@ lifecycleViewmodel = "2.8.0"
 coroutines = "1.8.1"
 kotlinxSerializationJson = "1.7.3"
 playServicesLocation = "21.3.0"
+appcompat = "1.7.0"
 glance = "1.1.0"
 
 [libraries]
@@ -55,6 +56,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Location (GPS capture on frame log)
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+# AppCompat — required for OssLicensesMenuActivity which extends AppCompatActivity
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 # Glance — home screen widget (Compose-based RemoteViews API)
 androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }

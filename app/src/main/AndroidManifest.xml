@@ -41,6 +41,20 @@
         </activity>
 
         <!--
+            OSS Licenses activities — must use an AppCompat theme because they extend
+            AppCompatActivity. Theme.Detent.OssLicenses is an AppCompat-compatible theme
+            that matches the app's Golden Hour color palette.
+        -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity"
+            tools:replace="android:theme"
+            android:theme="@style/Theme.Detent.OssLicenses" />
+        <activity
+            android:name="com.google.android.gms.oss.licenses.v2.OssLicensesActivity"
+            tools:replace="android:theme"
+            android:theme="@style/Theme.Detent.OssLicenses" />
+
+        <!--
             FileProvider exposes backup files from the cache directory via content:// URIs
             so the system share sheet can read them. Authority must match the string used
             in SettingsScreen.kt when calling FileProvider.getUriForFile().

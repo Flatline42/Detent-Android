@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -76,6 +77,12 @@ dependencies {
 
     // Location — FusedLocationProviderClient for GPS capture on frame log
     implementation(libs.play.services.location)
+
+    // OSS Licenses — runtime library that provides OssLicensesMenuActivity
+    implementation("com.google.android.gms:play-services-oss-licenses:17.4.0")
+
+    // AppCompat — required because OssLicensesMenuActivity extends AppCompatActivity
+    implementation(libs.androidx.appcompat)
 
     // Glance — home screen widget (Compose-style API over RemoteViews)
     implementation(libs.androidx.glance.appwidget)

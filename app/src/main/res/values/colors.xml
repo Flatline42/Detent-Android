@@ -7,4 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Golden Hour primary — matches BurntOrange in Color.kt -->
+    <color name="burnt_orange">#F7882F</color>
 </resources>

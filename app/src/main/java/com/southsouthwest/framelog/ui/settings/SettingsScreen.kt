@@ -51,6 +51,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity
 import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.data.ExportFormat
 import com.southsouthwest.framelog.ui.navigation.Welcome
@@ -117,6 +118,13 @@ fun SettingsScreen(navController: NavHostController) {
     var showResetStage2Dialog by remember { mutableStateOf(false) }
     var showResetRestartDialog by remember { mutableStateOf(false) }
 
+    var showFontLicensesDialog by remember { mutableStateOf(false) }
+    val fontCreditsText = remember {
+        runCatching {
+            context.assets.open("licenses/FONT_CREDITS.txt").bufferedReader().readText()
+        }.getOrDefault("Font credits unavailable.")
+    }
+
     // ── File picker for backup restore ────────────────────────────────────
     val filePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent(),
@@ -160,8 +168,7 @@ fun SettingsScreen(navController: NavHostController) {
                 }
 
                 is SettingsEvent.OpenOssLicenses -> {
-                    // OSS Licenses screen requires the Play OSS Licenses Gradle plugin — TODO
-                    snackbarHostState.showSnackbar("Open source licenses coming in a future update")
+                    context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
                 }
 
                 is SettingsEvent.NavigateToOnboarding -> {
@@ -355,6 +362,13 @@ fun SettingsScreen(navController: NavHostController) {
                 SettingsRow(
                     label = "Privacy policy",
                     onClick = { openUrl(context, PRIVACY_POLICY_URL) },
+                )
+            }
+            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
+            item {
+                SettingsRow(
+                    label = "Font licenses",
+                    onClick = { showFontLicensesDialog = true },
                 )
             }
             item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
@@ -614,6 +628,18 @@ fun SettingsScreen(navController: NavHostController) {
             },
             dismissButton = {
                 TextButton(onClick = { showResetRestartDialog = false }) { Text("Later") }
+            },
+        )
+    }
+
+    // ── Font licenses dialog ───────────────────────────────────────────────
+    if (showFontLicensesDialog) {
+        AlertDialog(
+            onDismissRequest = { showFontLicensesDialog = false },
+            title = { Text("Font licenses") },
+            text = { Text(fontCreditsText) },
+            confirmButton = {
+                TextButton(onClick = { showFontLicensesDialog = false }) { Text("Close") }
             },
         )
     }
