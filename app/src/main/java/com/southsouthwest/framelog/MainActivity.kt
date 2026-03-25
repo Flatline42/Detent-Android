@@ -8,10 +8,12 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.ui.navigation.FrameLogNavGraph
+import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.southsouthwest.framelog.ui.theme.DetentTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,9 +21,9 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         val appPrefs = AppPreferences(this)
-        
+
         setContent {
             val appTheme by appPrefs.appThemeFlow.collectAsState(initial = appPrefs.appTheme)
             val isDarkTheme = when (appTheme) {
@@ -29,10 +31,13 @@ class MainActivity : ComponentActivity() {
                 AppTheme.DARK -> true
                 AppTheme.SYSTEM -> isSystemInDarkTheme()
             }
-            
+
             DetentTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
-                FrameLogNavGraph(navController)
+                // OnboardingViewModel lives at the activity level so it persists across
+                // all destination changes during the coached first-run flow.
+                val onboardingViewModel: OnboardingViewModel = viewModel()
+                FrameLogNavGraph(navController, onboardingViewModel)
             }
         }
     }

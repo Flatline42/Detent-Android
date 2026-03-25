@@ -53,6 +53,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -74,6 +77,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.southsouthwest.framelog.data.ExportFormat
+import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
+import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.southsouthwest.framelog.data.db.entity.Frame
 import com.southsouthwest.framelog.data.db.entity.Roll
 import com.southsouthwest.framelog.data.db.entity.RollStatus
@@ -93,9 +98,14 @@ private enum class FrameSort { ASCENDING, DESCENDING }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RollJournalScreen(navController: NavHostController) {
+fun RollJournalScreen(
+    navController: NavHostController,
+    onboardingViewModel: OnboardingViewModel? = null,
+) {
     val viewModel: RollJournalViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val onboardingStep by (onboardingViewModel?.step?.collectAsState()
+        ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
     val context = LocalContext.current
 
     // Local dialog visibility — set to true by one-shot events from the ViewModel
@@ -334,7 +344,21 @@ fun RollJournalScreen(navController: NavHostController) {
                         lensName = lensNameMap[frame.lensId],
                         isCurrent = frame.frameNumber == state.currentFrameNumber,
                         onTapped = { viewModel.onFrameCardTapped(frame.id) },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .then(
+                                if (frame.frameNumber == 1 &&
+                                    onboardingStep == OnboardingStep.ROLL_JOURNAL_TOUR
+                                ) {
+                                    Modifier.onGloballyPositioned { coords ->
+                                        onboardingViewModel?.updateSpotlightBounds(
+                                            coords.boundsInWindow(),
+                                        )
+                                    }
+                                } else {
+                                    Modifier
+                                },
+                            ),
                     )
                 }
 

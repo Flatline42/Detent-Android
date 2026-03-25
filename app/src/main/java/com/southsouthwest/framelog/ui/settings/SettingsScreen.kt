@@ -53,6 +53,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.southsouthwest.framelog.data.AppTheme
 import com.southsouthwest.framelog.data.ExportFormat
+import com.southsouthwest.framelog.ui.navigation.Welcome
+import com.southsouthwest.framelog.ui.navigation.WidgetSetup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -163,13 +165,11 @@ fun SettingsScreen(navController: NavHostController) {
                 }
 
                 is SettingsEvent.NavigateToOnboarding -> {
-                    // TODO: navigate to Welcome/onboarding screen once implemented
-                    snackbarHostState.showSnackbar("Re-run onboarding — coming soon")
+                    navController.navigate(Welcome)
                 }
 
                 is SettingsEvent.NavigateToWidgetSetup -> {
-                    // TODO: navigate to Widget Setup screen once implemented
-                    snackbarHostState.showSnackbar("Widget setup instructions — coming soon")
+                    navController.navigate(WidgetSetup(fromOnboarding = false))
                 }
 
                 is SettingsEvent.ShowErrorMessage -> {

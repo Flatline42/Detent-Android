@@ -47,6 +47,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,6 +72,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.southsouthwest.framelog.data.db.entity.Roll
+import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
+import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.southsouthwest.framelog.data.db.entity.RollStatus
 import com.southsouthwest.framelog.data.db.relation.RollListRow
 import com.southsouthwest.framelog.ui.navigation.RollJournal
@@ -86,9 +91,12 @@ import java.util.Locale
 @Composable
 fun RollListScreen(
     navController: NavController,
+    onboardingViewModel: OnboardingViewModel? = null,
     vm: RollListViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val onboardingStep by (onboardingViewModel?.step?.collectAsState()
+        ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -120,7 +128,14 @@ fun RollListScreen(
             TopAppBar(title = { Text("Rolls") })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = vm::onAddRollTapped) {
+            FloatingActionButton(
+                onClick = vm::onAddRollTapped,
+                modifier = Modifier.onGloballyPositioned { coords ->
+                    if (onboardingStep == OnboardingStep.CREATE_ROLL) {
+                        onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                    }
+                },
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "New roll")
             }
         },
@@ -142,6 +157,11 @@ fun RollListScreen(
                 Tab(
                     selected = state.selectedTab == RollListTab.FINISHED,
                     onClick = { vm.onTabSelected(RollListTab.FINISHED) },
+                    modifier = Modifier.onGloballyPositioned { coords ->
+                        if (onboardingStep == OnboardingStep.FINISHED_ROLLS_TOUR) {
+                            onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                        }
+                    },
                     text = {
                         val count = state.finishedRolls.size
                         Text(if (count > 0) "Finished ($count)" else "Finished")

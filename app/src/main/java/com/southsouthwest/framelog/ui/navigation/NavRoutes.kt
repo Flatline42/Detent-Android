@@ -62,3 +62,15 @@ data class FrameDetail(val frameId: Int, val rollId: Int)
 /** App settings. */
 @Serializable
 object Settings
+
+/** First-run welcome screen. Shown when onboardingComplete = false. */
+@Serializable
+object Welcome
+
+/**
+ * Widget setup instructions screen.
+ * [fromOnboarding] = true when arrived from the onboarding flow (step 11).
+ * When true, the "Done" button completes onboarding and navigates to Quick Screen.
+ */
+@Serializable
+data class WidgetSetup(val fromOnboarding: Boolean = false)

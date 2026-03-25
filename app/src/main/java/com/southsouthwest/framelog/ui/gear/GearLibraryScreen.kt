@@ -29,16 +29,21 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
+import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.southsouthwest.framelog.data.db.entity.CameraBody
 import com.southsouthwest.framelog.data.db.entity.FilmStock
 import com.southsouthwest.framelog.data.db.entity.Filter
@@ -57,9 +62,22 @@ import java.util.Locale
 @Composable
 fun GearLibraryScreen(
     navController: NavController,
+    onboardingViewModel: OnboardingViewModel? = null,
     vm: GearLibraryViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
+
+    // Steps where the Gear Library FAB is the spotlight target.
+    val gearFabSteps = remember {
+        setOf(
+            OnboardingStep.ADD_LENS,
+            OnboardingStep.ADD_BODY,
+            OnboardingStep.ADD_FILM_STOCK,
+            OnboardingStep.KITS_TOUR,
+        )
+    }
+    val onboardingStep by (onboardingViewModel?.step?.collectAsState()
+        ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
 
     // Translate ViewModel events to navigation actions
     LaunchedEffect(Unit) {
@@ -95,6 +113,11 @@ fun GearLibraryScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
+                modifier = Modifier.onGloballyPositioned { coords ->
+                    if (onboardingStep in gearFabSteps) {
+                        onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                    }
+                },
                 text = { Text(state.selectedTab.fabLabel) },
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
                 onClick = {
@@ -115,7 +138,17 @@ fun GearLibraryScreen(
                 .padding(innerPadding),
         ) {
             val tabs = GearTab.entries
-            ScrollableTabRow(selectedTabIndex = tabs.indexOf(state.selectedTab)) {
+            ScrollableTabRow(
+                selectedTabIndex = tabs.indexOf(state.selectedTab),
+                modifier = Modifier.onGloballyPositioned { coords ->
+                    val bounds = coords.boundsInWindow()
+                    onboardingViewModel?.updateTabRowBounds(bounds)
+                    // FILTERS_TOUR spotlights the tab row itself
+                    if (onboardingStep == OnboardingStep.FILTERS_TOUR) {
+                        onboardingViewModel?.updateSpotlightBounds(bounds)
+                    }
+                },
+            ) {
                 tabs.forEach { tab ->
                     Tab(
                         selected = state.selectedTab == tab,

@@ -50,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +60,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -69,6 +72,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
+import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.southsouthwest.framelog.data.db.entity.Filter
@@ -88,9 +93,14 @@ import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun QuickScreenScreen(navController: NavHostController) {
+fun QuickScreenScreen(
+    navController: NavHostController,
+    onboardingViewModel: OnboardingViewModel? = null,
+) {
     val viewModel: QuickScreenViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val onboardingStep by (onboardingViewModel?.step?.collectAsState()
+        ?: remember { mutableStateOf(OnboardingStep.COMPLETE) })
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -234,15 +244,23 @@ fun QuickScreenScreen(navController: NavHostController) {
                         .padding(innerPadding),
                 ) {
                     // ── Header ──────────────────────────────────────────────
-                    QuickScreenHeader(
-                        rollName = activeRoll.roll.name,
-                        hasMultipleRolls = state.loadedRolls.size > 1,
-                        activeFilterCount = activeFilterObjs.size,
-                        currentFrameNumber = state.currentFrameNumber,
-                        totalFrames = activeRoll.frames.size,
-                        totalEvText = totalEvText,
-                        onHeaderTapped = viewModel::onHeaderTapped,
-                    )
+                    Box(
+                        modifier = Modifier.onGloballyPositioned { coords ->
+                            if (onboardingStep == OnboardingStep.QS_HEADER) {
+                                onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                            }
+                        },
+                    ) {
+                        QuickScreenHeader(
+                            rollName = activeRoll.roll.name,
+                            hasMultipleRolls = state.loadedRolls.size > 1,
+                            activeFilterCount = activeFilterObjs.size,
+                            currentFrameNumber = state.currentFrameNumber,
+                            totalFrames = activeRoll.frames.size,
+                            totalEvText = totalEvText,
+                            onHeaderTapped = viewModel::onHeaderTapped,
+                        )
+                    }
                     HorizontalDivider()
 
                     // ── Scrollable interactive controls ──────────────────────
@@ -255,6 +273,13 @@ fun QuickScreenScreen(navController: NavHostController) {
                         Spacer(modifier = Modifier.weight(1f))
 
                         // Frame pointer stepper
+                        Box(
+                            modifier = Modifier.onGloballyPositioned { coords ->
+                                if (onboardingStep == OnboardingStep.QS_FRAME) {
+                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                                }
+                            },
+                        ) {
                         SmallStepper(
                             label = "frame pointer",
                             displayText = "${state.currentFrameNumber} / ${activeRoll.frames.size}",
@@ -268,6 +293,7 @@ fun QuickScreenScreen(navController: NavHostController) {
                             },
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        }
 
                         // Off-frontier indicator — shown when the user has manually navigated
                         // away from the next expected unlogged frame.
@@ -307,27 +333,43 @@ fun QuickScreenScreen(navController: NavHostController) {
                         val selectedLens = rollLenses
                             .firstOrNull { it.lens.id == state.selectedLensId }?.lens
                             ?: rollLenses.firstOrNull()?.lens
-                        LensRow(
-                            lensName = selectedLens?.name,
-                            hasMultipleLenses = rollLenses.size > 1,
-                            onCycleLens = viewModel::onLensCycleTapped,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
+                        Box(
+                            modifier = Modifier.onGloballyPositioned { coords ->
+                                if (onboardingStep == OnboardingStep.QS_LENS) {
+                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                                }
+                            },
+                        ) {
+                            LensRow(
+                                lensName = selectedLens?.name,
+                                hasMultipleLenses = rollLenses.size > 1,
+                                onCycleLens = viewModel::onLensCycleTapped,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            )
+                        }
 
                         Spacer(Modifier.height(8.dp))
 
                         // Filter chips + EV sum
-                        FilterChipsRow(
-                            displayedFilters = displayedFilters,
-                            activeFilterIds = state.activeFilterIds,
-                            hasMoreFilters = hasMoreFilters || rollFilters.isNotEmpty(),
-                            filterEvSum = filterEvSum,
-                            filterHasNullEv = filterHasNullEv,
-                            activeCount = activeFilterObjs.size,
-                            onFilterToggled = viewModel::onFilterToggled,
-                            onOpenPicker = { showFilterPicker = true },
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                        )
+                        Box(
+                            modifier = Modifier.onGloballyPositioned { coords ->
+                                if (onboardingStep == OnboardingStep.QS_FILTERS) {
+                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                                }
+                            },
+                        ) {
+                            FilterChipsRow(
+                                displayedFilters = displayedFilters,
+                                activeFilterIds = state.activeFilterIds,
+                                hasMoreFilters = hasMoreFilters || rollFilters.isNotEmpty(),
+                                filterEvSum = filterEvSum,
+                                filterHasNullEv = filterHasNullEv,
+                                activeCount = activeFilterObjs.size,
+                                onFilterToggled = viewModel::onFilterToggled,
+                                onOpenPicker = { showFilterPicker = true },
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                            )
+                        }
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -357,6 +399,14 @@ fun QuickScreenScreen(navController: NavHostController) {
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+                        // Aperture + shutter steppers — wrapped together for QS_STEPPERS spotlight
+                        Column(
+                            modifier = Modifier.onGloballyPositioned { coords ->
+                                if (onboardingStep == OnboardingStep.QS_STEPPERS) {
+                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                                }
+                            },
+                        ) {
                         // Aperture — + = wider (lower index), − = narrower (higher index)
                         LargeStepper(
                             label = "aperture",
@@ -402,6 +452,7 @@ fun QuickScreenScreen(navController: NavHostController) {
                             },
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        } // end Column wrapper for QS_STEPPERS
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -453,7 +504,12 @@ fun QuickScreenScreen(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .height(64.dp),
+                            .height(64.dp)
+                            .onGloballyPositioned { coords ->
+                                if (onboardingStep == OnboardingStep.QS_LOG_FRAME) {
+                                    onboardingViewModel?.updateSpotlightBounds(coords.boundsInWindow())
+                                }
+                            },
                         enabled = !state.isLoggingFrame,
                     ) {
                         if (state.isLoggingFrame) {
