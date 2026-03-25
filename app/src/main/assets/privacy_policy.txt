@@ -1,0 +1,51 @@
+Privacy Policy
+DETENT
+Effective date: 2026-03-24
+Developer: TODO_DEVELOPER_NAME
+Contact: TODO_CONTACT_EMAIL
+
+---
+
+The short version: DETENT collects nothing about you. It has no
+internet connection, no accounts, and no servers. Everything you
+enter stays on your phone.
+
+---
+
+What data the app stores
+
+DETENT stores your rolls, frames, gear, and settings in a local
+database on your device. Nothing is sent anywhere.
+
+If you enable GPS on a roll, the app will ask for location
+permission and attach coordinates to frames you log. Those
+coordinates are stored locally in the same database — they are
+never transmitted, uploaded, or shared.
+
+What the app does not do
+
+- No analytics or usage tracking of any kind
+- No advertising
+- No crash reporting sent to external servers
+- No accounts or login
+- No cloud sync
+- No network requests (the app is fully offline)
+
+Backups
+
+If you use the backup feature, the app creates a .DETENT file on
+your device. You choose where it goes via the Android share sheet
+— the app does not send it anywhere automatically.
+
+Third-party services
+
+None. The app has no third-party SDKs that collect data.
+
+Changes to this policy
+
+If this policy changes in a future version, the updated version
+will be included in that release.
+
+Contact
+
+If you have questions, email TODO_CONTACT_EMAIL.

@@ -64,8 +64,6 @@ import java.io.File
 // TODO: Replace with actual Ko-fi profile URL before release
 private const val TIP_JAR_URL = "https://ko-fi.com/"
 
-// TODO: Replace with actual hosted privacy policy URL before release
-private const val PRIVACY_POLICY_URL = "https://southsouthwest.com/detent/privacy"
 
 // ---------------------------------------------------------------------------
 // Display labels for preference enums (private to this file)
@@ -123,6 +121,13 @@ fun SettingsScreen(navController: NavHostController) {
         runCatching {
             context.assets.open("licenses/FONT_CREDITS.txt").bufferedReader().readText()
         }.getOrDefault("Font credits unavailable.")
+    }
+
+    var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
+    val privacyPolicyText = remember {
+        runCatching {
+            context.assets.open("privacy_policy.txt").bufferedReader().readText()
+        }.getOrDefault("Privacy policy unavailable.")
     }
 
     // ── File picker for backup restore ────────────────────────────────────
@@ -361,7 +366,7 @@ fun SettingsScreen(navController: NavHostController) {
             item {
                 SettingsRow(
                     label = "Privacy policy",
-                    onClick = { openUrl(context, PRIVACY_POLICY_URL) },
+                    onClick = { showPrivacyPolicyDialog = true },
                 )
             }
             item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
@@ -628,6 +633,18 @@ fun SettingsScreen(navController: NavHostController) {
             },
             dismissButton = {
                 TextButton(onClick = { showResetRestartDialog = false }) { Text("Later") }
+            },
+        )
+    }
+
+    // ── Privacy policy dialog ──────────────────────────────────────────────
+    if (showPrivacyPolicyDialog) {
+        AlertDialog(
+            onDismissRequest = { showPrivacyPolicyDialog = false },
+            title = { Text("Privacy Policy") },
+            text = { Text(privacyPolicyText) },
+            confirmButton = {
+                TextButton(onClick = { showPrivacyPolicyDialog = false }) { Text("Close") }
             },
         )
     }
