@@ -139,14 +139,18 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
         )
         .build()
 
-    // Sound ID assigned by SoundPool after loading. 0 = not yet loaded.
     private var shutterSoundId: Int = 0
+    // True once OnLoadCompleteListener confirms the sample is buffered and ready.
+    private var shutterSoundReady: Boolean = false
 
     private val audioManager = application.getSystemService(AudioManager::class.java)
 
     init {
         collectLoadedRolls()
-        // Load the sound asynchronously; play() silently no-ops if loading hasn't finished yet.
+        // Register the listener BEFORE load() so the callback is never missed.
+        soundPool.setOnLoadCompleteListener { _, _, status ->
+            if (status == 0) shutterSoundReady = true
+        }
         shutterSoundId = soundPool.load(application, R.raw.shutter_click, 1)
     }
 
@@ -166,7 +170,7 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
         if (!appPreferences.shutterSoundEnabled) return
         val ringerMode = audioManager?.ringerMode ?: AudioManager.RINGER_MODE_NORMAL
         if (ringerMode != AudioManager.RINGER_MODE_NORMAL) return
-        if (shutterSoundId == 0) return  // still loading
+        if (!shutterSoundReady) return  // load() hasn't completed yet
         soundPool.play(shutterSoundId, 1f, 1f, 0, 0, 1f)
     }
 
