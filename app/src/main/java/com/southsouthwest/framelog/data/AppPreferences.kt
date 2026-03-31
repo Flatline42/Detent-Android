@@ -21,6 +21,7 @@ private const val KEY_APP_THEME = "app_theme"
 private const val KEY_ACCESSIBLE_COLOR_MODE = "accessible_color_mode"
 private const val KEY_TIP_JAR_PROMPT_SHOWN = "tip_jar_prompt_shown"
 private const val KEY_APERTURE_WHEEL_REVERSED = "aperture_wheel_reversed"
+private const val KEY_SHUTTER_SOUND_ENABLED = "shutter_sound_enabled"
 
 // Per-roll keys
 private fun keyCurrentFrame(rollId: Int) = "current_frame_$rollId"
@@ -124,6 +125,14 @@ class AppPreferences(context: Context) {
     var apertureWheelReversed: Boolean
         get() = prefs.getBoolean(KEY_APERTURE_WHEEL_REVERSED, false)
         set(value) = prefs.edit { putBoolean(KEY_APERTURE_WHEEL_REVERSED, value) }
+
+    /**
+     * Whether to play a shutter click sound after a frame is successfully logged.
+     * Defaults to on. Silenced automatically when the device ringer is muted or in vibrate mode.
+     */
+    var shutterSoundEnabled: Boolean
+        get() = prefs.getBoolean(KEY_SHUTTER_SOUND_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(KEY_SHUTTER_SOUND_ENABLED, value) }
 
     /**
      * When true, color-coded elements (e.g. long-exposure shutter speeds) use a supplementary

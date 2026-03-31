@@ -29,6 +29,7 @@ data class SettingsUiState(
     val extraFramesPerRoll: Int = 2,
     val gpsCaptureEnabled: Boolean = false,
     val defaultExportFormat: ExportFormat = ExportFormat.CSV,
+    val shutterSoundEnabled: Boolean = true,
     // Appearance
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val accessibleColorMode: Boolean = false,
@@ -81,6 +82,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             extraFramesPerRoll = appPreferences.extraFramesPerRoll,
             gpsCaptureEnabled = appPreferences.gpsCaptureEnabled,
             defaultExportFormat = appPreferences.defaultExportFormat,
+            shutterSoundEnabled = appPreferences.shutterSoundEnabled,
             appTheme = appPreferences.appTheme,
             accessibleColorMode = appPreferences.accessibleColorMode,
             apertureWheelReversed = appPreferences.apertureWheelReversed,
@@ -109,6 +111,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun onDefaultExportFormatChanged(format: ExportFormat) {
         appPreferences.defaultExportFormat = format
         _state.update { it.copy(defaultExportFormat = format) }
+    }
+
+    fun onShutterSoundEnabledChanged(enabled: Boolean) {
+        appPreferences.shutterSoundEnabled = enabled
+        _state.update { it.copy(shutterSoundEnabled = enabled) }
     }
 
     // ---------------------------------------------------------------------------

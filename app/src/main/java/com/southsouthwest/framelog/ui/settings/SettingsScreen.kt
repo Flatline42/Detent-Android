@@ -234,6 +234,19 @@ fun SettingsScreen(navController: NavHostController) {
             item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
             item {
                 SettingsRow(
+                    label = "Shutter sound",
+                    sublabel = "Play a click when a frame is logged",
+                    trailing = {
+                        Switch(
+                            checked = state.shutterSoundEnabled,
+                            onCheckedChange = viewModel::onShutterSoundEnabledChanged,
+                        )
+                    },
+                )
+            }
+            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
+            item {
+                SettingsRow(
                     label = "Default export format",
                     value = state.defaultExportFormat.label,
                     onClick = { showExportFormatDialog = true },

@@ -1,8 +1,12 @@
 package com.southsouthwest.framelog.ui.quickscreen
 
 import android.app.Application
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.SoundPool
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.southsouthwest.framelog.R
 import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.AppDatabase
 import com.southsouthwest.framelog.data.db.entity.Filter
@@ -119,8 +123,51 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
     private var pendingFiltersToAdd: List<FrameFilter> = emptyList()
     private var pendingFilterIdsToRemove: List<Int> = emptyList()
 
+    // ---------------------------------------------------------------------------
+    // Shutter sound
+    // ---------------------------------------------------------------------------
+
+    // SoundPool for the low-latency shutter click. Loaded once in init, released in onCleared.
+    // SoundPool is preferred over MediaPlayer for short UI sounds: lower latency, no seek overhead.
+    private val soundPool: SoundPool = SoundPool.Builder()
+        .setMaxStreams(1)
+        .setAudioAttributes(
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+        )
+        .build()
+
+    // Sound ID assigned by SoundPool after loading. 0 = not yet loaded.
+    private var shutterSoundId: Int = 0
+
+    private val audioManager = application.getSystemService(AudioManager::class.java)
+
     init {
         collectLoadedRolls()
+        // Load the sound asynchronously; play() silently no-ops if loading hasn't finished yet.
+        shutterSoundId = soundPool.load(application, R.raw.shutter_click, 1)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        soundPool.release()
+    }
+
+    /**
+     * Plays the shutter click sound if:
+     *   1. The user has not disabled it in Settings → Shooting Defaults.
+     *   2. The device ringer is not silenced or in vibrate-only mode.
+     *
+     * Called after the frame write commits to the database — never on button tap-down.
+     */
+    private fun playShutterSound() {
+        if (!appPreferences.shutterSoundEnabled) return
+        val ringerMode = audioManager?.ringerMode ?: AudioManager.RINGER_MODE_NORMAL
+        if (ringerMode != AudioManager.RINGER_MODE_NORMAL) return
+        if (shutterSoundId == 0) return  // still loading
+        soundPool.play(shutterSoundId, 1f, 1f, 0, 0, 1f)
     }
 
     private fun collectLoadedRolls() = viewModelScope.launch {
@@ -422,6 +469,8 @@ class QuickScreenViewModel(application: Application) : AndroidViewModel(applicat
                 }
             }
 
+            // Play the shutter click after the DB write — not on tap-down.
+            playShutterSound()
             _events.send(QuickScreenEvent.FrameLogged(loggedFrameNumber))
             // Sync widget to the newly logged frame and advanced pointer
             FrameLogWidgetUpdater.update(getApplication())
