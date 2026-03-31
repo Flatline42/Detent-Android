@@ -10,6 +10,7 @@ import android.os.Vibrator
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -76,11 +77,15 @@ import com.southsouthwest.framelog.ui.onboarding.OnboardingStep
 import com.southsouthwest.framelog.ui.onboarding.OnboardingViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.entity.Filter
 import com.southsouthwest.framelog.data.db.relation.RollWithDetails
 import com.southsouthwest.framelog.ui.navigation.RollJournal
 import com.southsouthwest.framelog.ui.navigation.RollSetup
 import com.southsouthwest.framelog.ui.util.ExposureValues
+import com.southsouthwest.framelog.ui.util.HorizontalScrollWheel
+import com.southsouthwest.framelog.ui.util.WheelNotation
+import com.southsouthwest.framelog.ui.util.wheelTierColors
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Calendar
@@ -380,35 +385,57 @@ fun QuickScreenScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                        // Exposure compensation — tapping the value clears it (sets to null)
-                        SmallStepper(
-                            label = "exposure compensation",
-                            displayText = ec?.let {
-                                ExposureValues.formatExposureCompensation(it) + " EV"
-                            } ?: "0 EV",
-                            displayColor = if (ec != null) MaterialTheme.colorScheme.onSurface
-                                          else MaterialTheme.colorScheme.onSurfaceVariant,
-                            canDecrement = ecIdx > 0,
-                            canIncrement = ecIdx < ecVals.size - 1,
-                            onDecrement = {
-                                if (ecIdx > 0) viewModel.onExposureCompensationChanged(ecVals[ecIdx - 1])
-                            },
-                            onIncrement = {
-                                if (ecIdx < ecVals.size - 1) {
-                                    viewModel.onExposureCompensationChanged(ecVals[ecIdx + 1])
-                                }
-                            },
-                            onValueTapped = if (ec != null) {
-                                { viewModel.onExposureCompensationChanged(null) }
-                            } else null,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        // Exposure compensation wheel — narrower, centered, recessed surround.
+                        // ec==null treated as 0 EV for wheel position; scrolling away from 0 sets
+                        // EC to the new value. The null state is preserved until the user moves
+                        // the wheel.
+                        run {
+                            val wheelColors = wheelTierColors()
+                            // ecVals runs -3.0 (index 0) → +3.0 (index last).
+                            // No reversal — swipe right moves toward lower index = more negative EC.
+                            // Swipe left moves toward higher index = more positive EC.
+                            val ecIdxInWheel = ecIdx
+
+                            Text(
+                                text = "exposure compensation",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            HorizontalScrollWheel(
+                                values = ecVals.map { ExposureValues.formatExposureCompensation(it) },
+                                selectedIndex = ecIdxInWheel,
+                                onValueChange = { wheelIdx ->
+                                    viewModel.onExposureCompensationChanged(ecVals[wheelIdx])
+                                },
+                                labelFor = { idx, isCenter ->
+                                    val v = ecVals[idx]
+                                    val isWholeStop = (Math.round(v * 3) % 3) == 0
+                                    when {
+                                        isCenter -> ExposureValues.formatExposureCompensation(v)
+                                        isWholeStop -> ExposureValues.formatExposureCompensation(v)
+                                        else -> "·"
+                                    }
+                                },
+                                notation = WheelNotation.DOTS,
+                                tierColors = wheelColors,
+                                subLabelFor = { idx ->
+                                    val v = ecVals[idx]
+                                    val isWholeStop = (Math.round(v * 3) % 3) == 0
+                                    // Show decimal value below the label for intermediate stops.
+                                    if (!isWholeStop) "%+.2f".format(v) else null
+                                },
+                                itemWidthDp = 56.dp,
+                                wheelHeightDp = 52.dp,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                        // Aperture + shutter steppers — wrapped together for QS_STEPPERS spotlight.
-                        // fillMaxWidth() ensures the tracked bounds span the full screen width so
-                        // the spotlight oval covers both steppers including their +/- buttons.
+                        // Aperture + shutter wheels — wrapped together for QS_STEPPERS spotlight.
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -420,51 +447,105 @@ fun QuickScreenScreen(
                                     }
                                 },
                         ) {
-                        // Aperture — + = wider (lower index), − = narrower (higher index)
-                        LargeStepper(
-                            label = "aperture",
-                            displayText = state.aperture ?: "—",
-                            canDecrement = apertureIndex < apertures.size - 1,
-                            canIncrement = apertureIndex > 0,
-                            onDecrement = {
-                                if (apertureIndex < apertures.size - 1) {
-                                    viewModel.onApertureChanged(apertures[apertureIndex + 1])
-                                }
-                            },
-                            onIncrement = {
-                                if (apertureIndex > 0) {
-                                    viewModel.onApertureChanged(apertures[apertureIndex - 1])
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                            // Read aperture wheel direction preference once at composition time.
+                            val apertureWheelReversed = remember {
+                                AppPreferences(context).apertureWheelReversed
+                            }
+                            val wheelColors = wheelTierColors()
 
-                        Spacer(Modifier.height(8.dp))
+                            // Aperture wheel — swipe right = open up (lower f/) by default.
+                            // apertureWheelReversed flips the list so swipe right = stop down.
+                            val aperturesForWheel = remember(apertures, apertureWheelReversed) {
+                                if (apertureWheelReversed) apertures.reversed() else apertures
+                            }
+                            val apertureIdxInWheel = if (apertureWheelReversed)
+                                apertures.size - 1 - apertureIndex
+                            else
+                                apertureIndex
 
-                        // Shutter speed — + = slower (lower index), − = faster (higher index)
-                        val shutterDisplay = state.shutterSpeed
-                            ?.let { ExposureValues.shutterDisplayValue(it) } ?: "—"
-                        val isLongExposure = state.shutterSpeed
-                            ?.let { ExposureValues.isLongExposure(it) } ?: false
-                        LargeStepper(
-                            label = "shutter speed",
-                            displayText = shutterDisplay,
-                            displayColor = if (isLongExposure) MaterialTheme.colorScheme.error
-                                           else MaterialTheme.colorScheme.onSurface,
-                            canDecrement = shutterIndex < shutterSpeeds.size - 1,
-                            canIncrement = shutterIndex > 0,
-                            onDecrement = {
-                                if (shutterIndex < shutterSpeeds.size - 1) {
-                                    viewModel.onShutterSpeedChanged(shutterSpeeds[shutterIndex + 1])
-                                }
-                            },
-                            onIncrement = {
-                                if (shutterIndex > 0) {
-                                    viewModel.onShutterSpeedChanged(shutterSpeeds[shutterIndex - 1])
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                            Text(
+                                text = "aperture",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            // Subtle container behind aperture wheel — 10% of the selected
+                            // tier color (GoldenHourAmber / AlpineGold per theme).
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = wheelColors.selected.copy(alpha = 0.10f),
+                                        shape = RoundedCornerShape(10.dp),
+                                    )
+                                    .padding(vertical = 4.dp),
+                            ) {
+                                HorizontalScrollWheel(
+                                    values = aperturesForWheel,
+                                    selectedIndex = apertureIdxInWheel,
+                                    onValueChange = { wheelIdx ->
+                                        viewModel.onApertureChanged(aperturesForWheel[wheelIdx])
+                                    },
+                                    labelFor = { idx, isCenter ->
+                                        val stored = aperturesForWheel[idx]
+                                        val num = stored.removePrefix("f/")
+                                        when {
+                                            isCenter -> num
+                                            ExposureValues.isFullStopAperture(stored) -> num
+                                            else -> "·"
+                                        }
+                                    },
+                                    notation = WheelNotation.DOTS,
+                                    tierColors = wheelColors,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.dp))
+
+                            // Shutter speed wheel — swipe right = slower/longer exposure.
+                            // shutterSpeeds[0] = B (slowest), so swipe-right → lower index → slower. ✓
+                            // Long-exposure values (whole seconds, B) render in colorScheme.error.
+                            val errorColor = MaterialTheme.colorScheme.error
+
+                            Text(
+                                text = "shutter speed",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            // Subtle container behind shutter wheel — same 10% primary tint.
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = wheelColors.selected.copy(alpha = 0.10f),
+                                        shape = RoundedCornerShape(10.dp),
+                                    )
+                                    .padding(vertical = 4.dp),
+                            ) {
+                                HorizontalScrollWheel(
+                                    values = shutterSpeeds,
+                                    selectedIndex = shutterIndex,
+                                    onValueChange = { wheelIdx ->
+                                        viewModel.onShutterSpeedChanged(shutterSpeeds[wheelIdx])
+                                    },
+                                    labelFor = { idx, _ ->
+                                        ExposureValues.shutterDisplayValue(shutterSpeeds[idx])
+                                    },
+                                    notation = WheelNotation.PIPES,
+                                    tierColors = wheelColors,
+                                    selectedColorOverride = { idx ->
+                                        if (ExposureValues.isLongExposure(shutterSpeeds[idx])) errorColor
+                                        else null
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
                         } // end Column wrapper for QS_STEPPERS
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -986,72 +1067,6 @@ private fun SmallStepper(
                 shape = RoundedCornerShape(4.dp),
             ) {
                 Text("+", style = MaterialTheme.typography.titleMedium)
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Large stepper — used for Aperture and Shutter Speed
-// ---------------------------------------------------------------------------
-
-@Composable
-private fun LargeStepper(
-    label: String,
-    displayText: String,
-    canDecrement: Boolean,
-    canIncrement: Boolean,
-    onDecrement: () -> Unit,
-    onIncrement: () -> Unit,
-    modifier: Modifier = Modifier,
-    displayColor: Color = Color.Unspecified,
-) {
-    val context = LocalContext.current
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(4.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            OutlinedButton(
-                onClick = { vibrateDecrement(context); onDecrement() },
-                enabled = canDecrement,
-                modifier = Modifier.size(52.dp),
-                contentPadding = PaddingValues(0.dp),
-                shape = RoundedCornerShape(6.dp),
-            ) {
-                Text("\u2212", style = MaterialTheme.typography.headlineSmall)
-            }
-            Spacer(Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .width(108.dp)
-                    .height(52.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = displayText,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = displayColor,
-                )
-            }
-            Spacer(Modifier.width(8.dp))
-            OutlinedButton(
-                onClick = { vibrateIncrement(context); onIncrement() },
-                enabled = canIncrement,
-                modifier = Modifier.size(52.dp),
-                contentPadding = PaddingValues(0.dp),
-                shape = RoundedCornerShape(6.dp),
-            ) {
-                Text("+", style = MaterialTheme.typography.headlineSmall)
             }
         }
     }

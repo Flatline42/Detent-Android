@@ -32,6 +32,7 @@ data class SettingsUiState(
     // Appearance
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val accessibleColorMode: Boolean = false,
+    val apertureWheelReversed: Boolean = false,
     // In-progress operations
     val isExportingBackup: Boolean = false,
     val isRestoringBackup: Boolean = false,
@@ -82,6 +83,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             defaultExportFormat = appPreferences.defaultExportFormat,
             appTheme = appPreferences.appTheme,
             accessibleColorMode = appPreferences.accessibleColorMode,
+            apertureWheelReversed = appPreferences.apertureWheelReversed,
         )
     )
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
@@ -121,6 +123,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun onAccessibleColorModeChanged(enabled: Boolean) {
         appPreferences.accessibleColorMode = enabled
         _state.update { it.copy(accessibleColorMode = enabled) }
+    }
+
+    fun onApertureWheelReversedChanged(reversed: Boolean) {
+        appPreferences.apertureWheelReversed = reversed
+        _state.update { it.copy(apertureWheelReversed = reversed) }
     }
 
     // ---------------------------------------------------------------------------

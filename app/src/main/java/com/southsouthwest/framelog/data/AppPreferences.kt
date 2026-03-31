@@ -20,6 +20,7 @@ private const val KEY_DEFAULT_EXPORT_FORMAT = "default_export_format"
 private const val KEY_APP_THEME = "app_theme"
 private const val KEY_ACCESSIBLE_COLOR_MODE = "accessible_color_mode"
 private const val KEY_TIP_JAR_PROMPT_SHOWN = "tip_jar_prompt_shown"
+private const val KEY_APERTURE_WHEEL_REVERSED = "aperture_wheel_reversed"
 
 // Per-roll keys
 private fun keyCurrentFrame(rollId: Int) = "current_frame_$rollId"
@@ -110,6 +111,19 @@ class AppPreferences(context: Context) {
         trySend(appTheme)
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
+
+    /**
+     * Controls the scroll direction for the aperture wheel.
+     *
+     * false (default) — "Large aperture → Small": swipe right opens the aperture (lower f-number).
+     * true            — "Small aperture → Large": swipe right stops down (higher f-number).
+     *
+     * This matches the convention of different camera brands where the aperture ring
+     * may rotate in opposite directions to open the aperture.
+     */
+    var apertureWheelReversed: Boolean
+        get() = prefs.getBoolean(KEY_APERTURE_WHEEL_REVERSED, false)
+        set(value) = prefs.edit { putBoolean(KEY_APERTURE_WHEEL_REVERSED, value) }
 
     /**
      * When true, color-coded elements (e.g. long-exposure shutter speeds) use a supplementary

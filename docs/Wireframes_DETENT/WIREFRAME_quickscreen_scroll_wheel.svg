@@ -1,0 +1,173 @@
+<svg viewBox="0 0 280 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .label { font-family: sans-serif; font-size: 9px; fill: #888; }
+      .value-lg { font-family: sans-serif; font-size: 22px; font-weight: 500; fill: #111; }
+      .value-sm { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .value-ec { font-family: sans-serif; font-size: 17px; font-weight: 500; fill: #111; }
+      .peek-1 { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .peek-2 { font-family: sans-serif; font-size: 9px; fill: #bbb; }
+      .dot { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #bbb; }
+      .dot-adj { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #888; }
+      .pipe { font-family: sans-serif; font-size: 10px; fill: #bbb; }
+      .pipe-adj { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small { font-family: sans-serif; font-size: 10px; fill: #888; }
+      .small-muted { font-family: sans-serif; font-size: 9px; fill: #aaa; }
+      .sub-value { font-family: sans-serif; font-size: 8px; fill: #aaa; }
+      .btn-label { font-family: sans-serif; font-size: 13px; font-weight: 500; fill: #111; }
+      .arrow-sm { font-family: sans-serif; font-size: 12px; fill: #888; }
+      .chip-on { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .chip-off { fill: #efefef; stroke: #ddd; stroke-width: 0.5; }
+      .chip-text { font-family: sans-serif; font-size: 9px; font-weight: 500; fill: #111; }
+      .annotation { font-family: monospace; font-size: 7px; fill: #bbb; }
+      .outer { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; }
+      .box { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .wheel { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .wheel-ec { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+      .ec-surround { fill: #f0f0f0; stroke: #ccc; stroke-width: 0.5; }
+      .selected-bg { fill: #fff3cc; stroke: none; }
+      .logbtn { fill: #fff; stroke: #bbb; stroke-width: 1; }
+      .btn { fill: #efefef; stroke: #bbb; stroke-width: 0.5; }
+      .divider { stroke: #e0e0e0; stroke-width: 0.5; }
+      .note-input { fill: #fff; stroke: #ccc; stroke-width: 0.5; }
+
+      /* Color spec annotations */
+      .spec-selected { font-family: monospace; font-size: 7px; fill: #FFBF00; }
+      .spec-adj { font-family: monospace; font-size: 7px; fill: #A28089; }
+      .spec-far { font-family: monospace; font-size: 7px; fill: #bbb; }
+    </style>
+  </defs>
+
+  <!-- Shell -->
+  <rect x="10" y="10" width="260" height="700" rx="16" class="outer"/>
+
+  <!-- Header -->
+  <rect x="10" y="10" width="260" height="52" rx="16" class="box"/>
+  <rect x="10" y="48" width="260" height="14" class="box"/>
+  <text x="24" y="28" class="small">HP5 Plus — Canon AE-1</text>
+  <text x="258" y="28" text-anchor="end" class="small">●● filters</text>
+  <text x="24" y="42" class="small-muted">Frame 14 / 38</text>
+  <text x="258" y="42" text-anchor="end" class="small-muted">-1.0 EV</text>
+  <line x1="10" y1="62" x2="270" y2="62" class="divider"/>
+
+  <!-- Frame pointer — +/- stepper -->
+  <text x="135" y="78" text-anchor="middle" class="label">frame pointer</text>
+  <rect x="68" y="82" width="28" height="28" rx="4" class="btn"/>
+  <text x="82" y="100" text-anchor="middle" class="arrow-sm">−</text>
+  <rect x="100" y="82" width="70" height="28" rx="4" class="box"/>
+  <text x="135" y="100" text-anchor="middle" class="value-sm">14 / 38</text>
+  <rect x="174" y="82" width="28" height="28" rx="4" class="btn"/>
+  <text x="188" y="100" text-anchor="middle" class="arrow-sm">+</text>
+  <text x="258" y="96" text-anchor="end" class="annotation">unchanged</text>
+
+  <!-- Lens -->
+  <text x="24" y="124" class="label">lens</text>
+  <rect x="24" y="128" width="222" height="28" rx="4" class="box"/>
+  <text x="135" y="146" text-anchor="middle" class="value-sm">FD 50mm f/1.4  ›</text>
+
+  <!-- Filters -->
+  <text x="24" y="172" class="label">filters</text>
+  <rect x="24" y="176" width="40" height="18" rx="9" class="chip-on"/>
+  <text x="44" y="189" text-anchor="middle" class="chip-text">YK2</text>
+  <rect x="68" y="176" width="32" height="18" rx="9" class="chip-on"/>
+  <text x="84" y="189" text-anchor="middle" class="chip-text">UV</text>
+  <rect x="104" y="176" width="20" height="18" rx="9" class="btn"/>
+  <text x="114" y="189" text-anchor="middle" class="chip-text">+</text>
+  <text x="258" y="189" text-anchor="end" class="small-muted">-1.0 EV</text>
+
+  <line x1="10" y1="204" x2="270" y2="204" class="divider"/>
+
+  <!-- EC wheel — narrower, centered -->
+  <text x="135" y="218" text-anchor="middle" class="label">exposure compensation</text>
+  <!-- surrounding recessed area -->
+  <rect x="24" y="222" width="222" height="44" rx="8" class="ec-surround"/>
+  <!-- actual wheel narrower -->
+  <rect x="46" y="224" width="178" height="40" rx="8" class="wheel-ec"/>
+  <!-- selected highlight -->
+  <rect x="119" y="226" width="32" height="36" rx="6" class="selected-bg"/>
+  <!-- far left -->
+  <text x="62" y="248" text-anchor="middle" class="peek-2">-1</text>
+  <text x="76" y="248" text-anchor="middle" class="dot">·</text>
+  <text x="88" y="248" text-anchor="middle" class="dot">·</text>
+  <!-- adj left -->
+  <text x="103" y="248" text-anchor="middle" class="peek-1">-⅓</text>
+  <text x="116" y="248" text-anchor="middle" class="dot-adj">·</text>
+  <!-- SELECTED #FFBF00 -->
+  <text x="135" y="250" text-anchor="middle" class="value-ec" style="fill:#FFBF00">0</text>
+  <!-- sub-value example -->
+  <text x="135" y="260" text-anchor="middle" class="sub-value">-0.67</text>
+  <text x="154" y="248" text-anchor="middle" class="dot-adj">·</text>
+  <!-- adj right -->
+  <text x="167" y="248" text-anchor="middle" class="peek-1">+⅓</text>
+  <text x="180" y="248" text-anchor="middle" class="dot">·</text>
+  <text x="192" y="248" text-anchor="middle" class="dot">·</text>
+  <!-- far right -->
+  <text x="208" y="248" text-anchor="middle" class="peek-2">+1</text>
+  <text x="24" y="274" class="annotation">sub-value shown in small text below selected when non-whole stop</text>
+
+  <line x1="10" y1="282" x2="270" y2="282" class="divider"/>
+
+  <!-- Aperture wheel LARGE -->
+  <text x="135" y="296" text-anchor="middle" class="label">aperture</text>
+  <rect x="24" y="300" width="222" height="58" rx="10" class="wheel"/>
+  <!-- selected highlight -->
+  <rect x="116" y="302" width="38" height="54" rx="8" class="selected-bg"/>
+  <!-- far left -->
+  <text x="40" y="333" text-anchor="middle" class="peek-2" style="font-size:9px">2.8</text>
+  <text x="58" y="333" text-anchor="middle" class="dot">·</text>
+  <!-- adj left -->
+  <text x="78" y="333" text-anchor="middle" class="peek-1">4</text>
+  <text x="98" y="333" text-anchor="middle" class="dot-adj">·</text>
+  <!-- SELECTED #FFBF00 -->
+  <text x="135" y="335" text-anchor="middle" class="value-lg" style="fill:#FFBF00">5.6</text>
+  <text x="172" y="333" text-anchor="middle" class="dot-adj">·</text>
+  <!-- adj right -->
+  <text x="192" y="333" text-anchor="middle" class="peek-1">8</text>
+  <text x="212" y="333" text-anchor="middle" class="dot">·</text>
+  <!-- far right -->
+  <text x="232" y="333" text-anchor="middle" class="peek-2" style="font-size:9px">11</text>
+
+  <!-- Shutter wheel LARGE -->
+  <text x="135" y="374" text-anchor="middle" class="label">shutter speed</text>
+  <rect x="24" y="378" width="222" height="58" rx="10" class="wheel"/>
+  <!-- selected highlight -->
+  <rect x="116" y="380" width="38" height="54" rx="8" class="selected-bg"/>
+  <!-- far left -->
+  <text x="40" y="411" text-anchor="middle" class="peek-2" style="font-size:9px">30</text>
+  <text x="58" y="411" text-anchor="middle" class="pipe">|</text>
+  <!-- adj left -->
+  <text x="78" y="411" text-anchor="middle" class="peek-1">60</text>
+  <text x="100" y="411" text-anchor="middle" class="pipe-adj">|</text>
+  <!-- SELECTED #FFBF00 -->
+  <text x="135" y="413" text-anchor="middle" class="value-lg" style="fill:#FFBF00">125</text>
+  <text x="170" y="411" text-anchor="middle" class="pipe-adj">|</text>
+  <!-- adj right -->
+  <text x="192" y="411" text-anchor="middle" class="peek-1">250</text>
+  <text x="212" y="411" text-anchor="middle" class="pipe">|</text>
+  <!-- far right -->
+  <text x="232" y="411" text-anchor="middle" class="peek-2" style="font-size:9px">500</text>
+
+  <line x1="10" y1="446" x2="270" y2="446" class="divider"/>
+
+  <!-- Note field -->
+  <text x="24" y="460" class="label">note</text>
+  <rect x="24" y="464" width="186" height="28" rx="4" class="note-input"/>
+  <text x="117" y="482" text-anchor="middle" class="small-muted">tap to type...</text>
+  <rect x="216" y="464" width="30" height="28" rx="4" class="btn"/>
+  <text x="231" y="482" text-anchor="middle" class="small">mic</text>
+
+  <line x1="10" y1="502" x2="270" y2="502" class="divider"/>
+
+  <!-- Log frame — note row width -->
+  <rect x="24" y="512" width="222" height="52" rx="10" class="logbtn"/>
+  <text x="135" y="543" text-anchor="middle" class="btn-label">log frame</text>
+
+  <!-- Color spec annotations -->
+  <line x1="10" y1="574" x2="270" y2="574" class="divider"/>
+  <text x="14" y="586" class="spec-selected">selected center: #FFBF00 Amber (Golden Hour) / #FFD700 Safety Gold (Alpine)</text>
+  <text x="14" y="597" class="spec-adj">adjacent ±1: #A28089 Dusty Mauve (Golden Hour) / #D1D1D1 Light Gray (Alpine)</text>
+  <text x="14" y="608" class="spec-far">far peek ±2 + dots/pipes: same as adj @ ~50% opacity</text>
+  <text x="14" y="619" class="annotation">all color values reference named constants in Color.kt — no hardcoded hex in composables</text>
+  <text x="14" y="630" class="annotation">swipe right = faster/larger (aperture open, shutter faster, EC positive)</text>
+  <text x="14" y="641" class="annotation">swipe left = slower/smaller — no direction toggle needed (single user)</text>
+</svg>

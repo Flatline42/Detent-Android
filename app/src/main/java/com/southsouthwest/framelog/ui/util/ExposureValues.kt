@@ -2,6 +2,7 @@ package com.southsouthwest.framelog.ui.util
 
 import com.southsouthwest.framelog.data.db.entity.ApertureIncrements
 import com.southsouthwest.framelog.data.db.entity.ShutterIncrements
+import kotlin.math.abs
 
 /**
  * Generates valid aperture and shutter speed value lists for stepper controls.
@@ -126,6 +127,16 @@ object ExposureValues {
         return all
             .filter { it >= maxAperture - 0.05f && it <= minAperture + 0.05f }
             .map { formatAperture(it) }
+    }
+
+    /**
+     * Returns true if [stored] is a full-stop aperture value (e.g. "f/5.6", "f/8").
+     * Full stops are the canonical named stops used in aperture-ring markings.
+     * Intermediate half- and third-stop values are NOT full stops.
+     */
+    fun isFullStopAperture(stored: String): Boolean {
+        val v = parseAperture(stored) ?: return false
+        return APERTURE_FULL.any { abs(it - v) < 0.05f }
     }
 
     /**

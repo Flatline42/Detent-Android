@@ -266,6 +266,22 @@ fun SettingsScreen(navController: NavHostController) {
                     },
                 )
             }
+            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
+            item {
+                SettingsRow(
+                    label = "Aperture wheel direction",
+                    sublabel = if (state.apertureWheelReversed)
+                        "Swipe right → stop down (higher f/)"
+                    else
+                        "Swipe right → open up (lower f/)",
+                    trailing = {
+                        Switch(
+                            checked = state.apertureWheelReversed,
+                            onCheckedChange = viewModel::onApertureWheelReversedChanged,
+                        )
+                    },
+                )
+            }
 
             item { HorizontalDivider() }
 

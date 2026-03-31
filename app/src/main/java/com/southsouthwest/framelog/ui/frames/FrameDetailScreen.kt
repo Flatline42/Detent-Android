@@ -6,7 +6,9 @@ import android.speech.RecognizerIntent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,7 +59,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -65,9 +66,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.southsouthwest.framelog.data.AppPreferences
 import com.southsouthwest.framelog.data.db.entity.Filter
 import com.southsouthwest.framelog.data.db.entity.Lens
 import com.southsouthwest.framelog.ui.util.ExposureValues
+import com.southsouthwest.framelog.ui.util.HorizontalScrollWheel
+import com.southsouthwest.framelog.ui.util.WheelNotation
+import com.southsouthwest.framelog.ui.util.wheelTierColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -343,7 +348,7 @@ fun FrameDetailScreen(navController: NavHostController) {
             HorizontalDivider()
 
             // ==================================================================
-            // Exposure compensation (centered, small stepper)
+            // Exposure compensation wheel (narrower, centered, recessed surround)
             // ==================================================================
 
             Spacer(Modifier.height(8.dp))
@@ -356,78 +361,44 @@ fun FrameDetailScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                // − button
-                OutlinedButton(
-                    onClick = {
-                        val newIdx = (ecIndex - 1).coerceAtLeast(0)
-                        viewModel.onExposureCompensationChanged(ecValues[newIdx])
-                    },
-                    enabled = ecIndex > 0,
-                    modifier = Modifier.height(36.dp).width(42.dp),
-                    contentPadding = PaddingValues(0.dp),
-                ) {
-                    Text("\u2212")
-                }
+            run {
+                val wheelColors = wheelTierColors()
+                // ecValues runs -3.0 (index 0) → +3.0 (index last). No reversal.
+                val ecIdxInWheel = ecIndex
 
-                // EC value display — tap to clear
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .width(80.dp)
-                        .clickable(enabled = state.exposureCompensation != null) {
-                            viewModel.onExposureCompensationChanged(null)
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    val ecDisplay = state.exposureCompensation
-                        ?.let { "${ExposureValues.formatExposureCompensation(it)} EV" }
-                        ?: "0 EV"
-                    val ecColor = if (state.exposureCompensation == null)
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    else
-                        MaterialTheme.colorScheme.onSurface
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = ecDisplay,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = ecColor,
-                            textAlign = TextAlign.Center,
-                        )
-                        if (state.exposureCompensation != null) {
-                            Text(
-                                text = "tap to clear",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textDecoration = TextDecoration.Underline,
-                            )
+                HorizontalScrollWheel(
+                    values = ecValues.map { ExposureValues.formatExposureCompensation(it) },
+                    selectedIndex = ecIdxInWheel,
+                    onValueChange = { wheelIdx ->
+                        viewModel.onExposureCompensationChanged(ecValues[wheelIdx])
+                    },
+                    labelFor = { idx, isCenter ->
+                        val v = ecValues[idx]
+                        val isWholeStop = (Math.round(v * 3) % 3) == 0
+                        when {
+                            isCenter -> ExposureValues.formatExposureCompensation(v)
+                            isWholeStop -> ExposureValues.formatExposureCompensation(v)
+                            else -> "·"
                         }
-                    }
-                }
-
-                // + button
-                OutlinedButton(
-                    onClick = {
-                        val newIdx = (ecIndex + 1).coerceAtMost(ecValues.size - 1)
-                        viewModel.onExposureCompensationChanged(ecValues[newIdx])
                     },
-                    enabled = ecIndex < ecValues.size - 1,
-                    modifier = Modifier.height(36.dp).width(42.dp),
-                    contentPadding = PaddingValues(0.dp),
-                ) {
-                    Text("+")
-                }
+                    notation = WheelNotation.DOTS,
+                    tierColors = wheelColors,
+                    subLabelFor = { idx ->
+                        val v = ecValues[idx]
+                        val isWholeStop = (Math.round(v * 3) % 3) == 0
+                        if (!isWholeStop) "%+.2f".format(v) else null
+                    },
+                    itemWidthDp = 56.dp,
+                    wheelHeightDp = 52.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             Spacer(Modifier.height(8.dp))
             HorizontalDivider()
 
             // ==================================================================
-            // Aperture stepper (large, centered)
+            // Aperture wheel
             // ==================================================================
 
             Spacer(Modifier.height(12.dp))
@@ -440,28 +411,56 @@ fun FrameDetailScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(6.dp))
 
-            // Aperture list is widest→narrowest (index 0 = widest = f/1.4).
-            // + = wider aperture (lower index), − = narrower aperture (higher index).
-            LargeStepper(
-                value = state.aperture ?: "—",
-                onDecrement = {
-                    // Narrower: step to higher index
-                    val next = state.availableApertures.getOrNull(apertureIndex + 1)
-                    if (next != null) viewModel.onApertureChanged(next)
-                },
-                onIncrement = {
-                    // Wider: step to lower index
-                    val prev = state.availableApertures.getOrNull(apertureIndex - 1)
-                    if (prev != null) viewModel.onApertureChanged(prev)
-                },
-                canDecrement = apertureIndex < state.availableApertures.size - 1,
-                canIncrement = apertureIndex > 0,
-            )
+            run {
+                val apertureWheelReversed = remember {
+                    AppPreferences(context).apertureWheelReversed
+                }
+                val wheelColors = wheelTierColors()
+                val aperturesForWheel = remember(state.availableApertures, apertureWheelReversed) {
+                    if (apertureWheelReversed) state.availableApertures.reversed()
+                    else state.availableApertures
+                }
+                val apertureIdxInWheel = if (apertureWheelReversed)
+                    state.availableApertures.size - 1 - apertureIndex
+                else
+                    apertureIndex
+
+                // Subtle container behind aperture wheel — 10% of the selected tier color.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = wheelColors.selected.copy(alpha = 0.10f),
+                            shape = RoundedCornerShape(10.dp),
+                        )
+                        .padding(vertical = 4.dp),
+                ) {
+                    HorizontalScrollWheel(
+                        values = aperturesForWheel,
+                        selectedIndex = apertureIdxInWheel,
+                        onValueChange = { wheelIdx ->
+                            viewModel.onApertureChanged(aperturesForWheel[wheelIdx])
+                        },
+                        labelFor = { idx, isCenter ->
+                            val stored = aperturesForWheel[idx]
+                            val num = stored.removePrefix("f/")
+                            when {
+                                isCenter -> num
+                                ExposureValues.isFullStopAperture(stored) -> num
+                                else -> "·"
+                            }
+                        },
+                        notation = WheelNotation.DOTS,
+                        tierColors = wheelColors,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
 
             Spacer(Modifier.height(12.dp))
 
             // ==================================================================
-            // Shutter speed stepper (large, centered)
+            // Shutter speed wheel
             // ==================================================================
 
             Text(
@@ -473,33 +472,41 @@ fun FrameDetailScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(6.dp))
 
-            // Shutter list is slowest→fastest (index 0 = B = slowest).
-            // + = slower shutter (lower index = more light), − = faster shutter (higher index).
-            val shutterDisplay = state.shutterSpeed
-                ?.let { ExposureValues.shutterDisplayValue(it) }
-                ?: "—"
-            val isLongExposure = state.shutterSpeed
-                ?.let { ExposureValues.isLongExposure(it) }
-                ?: false
+            run {
+                val wheelColors = wheelTierColors()
+                val errorColor = MaterialTheme.colorScheme.error
 
-            LargeStepper(
-                value = shutterDisplay,
-                onDecrement = {
-                    // Faster shutter: step to higher index
-                    val next = state.availableShutterSpeeds.getOrNull(shutterIndex + 1)
-                    if (next != null) viewModel.onShutterSpeedChanged(next)
-                },
-                onIncrement = {
-                    // Slower shutter: step to lower index
-                    val prev = state.availableShutterSpeeds.getOrNull(shutterIndex - 1)
-                    if (prev != null) viewModel.onShutterSpeedChanged(prev)
-                },
-                canDecrement = shutterIndex < state.availableShutterSpeeds.size - 1,
-                canIncrement = shutterIndex > 0,
-                // Whole-second values and bulb render in error/accent color per film camera convention
-                valueColor = if (isLongExposure) MaterialTheme.colorScheme.error
-                             else MaterialTheme.colorScheme.onSurface,
-            )
+                // Shutter list is slowest→fastest (index 0 = B).
+                // Swipe right → lower index → slower/longer exposure. ✓
+                // Subtle container — same 10% primary tint as aperture wheel.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = wheelColors.selected.copy(alpha = 0.10f),
+                            shape = RoundedCornerShape(10.dp),
+                        )
+                        .padding(vertical = 4.dp),
+                ) {
+                    HorizontalScrollWheel(
+                        values = state.availableShutterSpeeds,
+                        selectedIndex = shutterIndex,
+                        onValueChange = { wheelIdx ->
+                            viewModel.onShutterSpeedChanged(state.availableShutterSpeeds[wheelIdx])
+                        },
+                        labelFor = { idx, _ ->
+                            ExposureValues.shutterDisplayValue(state.availableShutterSpeeds[idx])
+                        },
+                        notation = WheelNotation.PIPES,
+                        tierColors = wheelColors,
+                        selectedColorOverride = { idx ->
+                            if (ExposureValues.isLongExposure(state.availableShutterSpeeds[idx])) errorColor
+                            else null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
 
             Spacer(Modifier.height(12.dp))
             HorizontalDivider()
@@ -668,73 +675,6 @@ fun FrameDetailScreen(navController: NavHostController) {
                 }
             },
         )
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Large stepper (aperture + shutter speed)
-// ---------------------------------------------------------------------------
-
-/**
- * Big stepper control used for aperture and shutter speed.
- * Mirrors the layout of the Quick Screen steppers: large tap targets, value centered.
- *
- * Button convention (consistent with camera dial direction):
- *   Aperture:      + = wider (lower f-number), − = narrower (higher f-number)
- *   Shutter speed: + = slower (more light),    − = faster  (less light)
- */
-@Composable
-private fun LargeStepper(
-    value: String,
-    onDecrement: () -> Unit,
-    onIncrement: () -> Unit,
-    canDecrement: Boolean,
-    canIncrement: Boolean,
-    modifier: Modifier = Modifier,
-    valueColor: Color = Color.Unspecified,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        OutlinedButton(
-            onClick = onDecrement,
-            enabled = canDecrement,
-            modifier = Modifier.size(52.dp),
-            contentPadding = PaddingValues(0.dp),
-        ) {
-            Text(
-                text = "\u2212",
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .width(108.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                color = valueColor,
-                textAlign = TextAlign.Center,
-            )
-        }
-
-        OutlinedButton(
-            onClick = onIncrement,
-            enabled = canIncrement,
-            modifier = Modifier.size(52.dp),
-            contentPadding = PaddingValues(0.dp),
-        ) {
-            Text(
-                text = "+",
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        }
     }
 }
 
