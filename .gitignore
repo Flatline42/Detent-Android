@@ -36,3 +36,5 @@ google-services.json
 # JKS Release Files
 detent-release.jks
 
+# Document files
+docs/
