@@ -54,8 +54,6 @@ sealed class RollListEvent {
     /** Emit to show the delete danger confirmation for [roll]. */
     data class ShowDeleteConfirmation(val roll: Roll) : RollListEvent()
     data class ShowErrorMessage(val message: String) : RollListEvent()
-    /** One-time tip jar nag prompt — emitted once when finished+archived total reaches 5. */
-    data object ShowTipNagPrompt : RollListEvent()
 }
 
 // ---------------------------------------------------------------------------
@@ -77,9 +75,6 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
 
     private val searchQuery = MutableStateFlow("")
 
-    /** Prevents the tip nag from appearing more than once within a single app session. */
-    private var tipNagShownThisSession = false
-
     init {
         collectActiveRolls()
         collectFinishedRolls()
@@ -99,7 +94,6 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
             rollRepository.searchRollListRowsByStatus(query, RollStatus.FINISHED.value)
         }.collect { rows ->
             _state.update { it.copy(finishedRolls = rows) }
-            checkTipNag(_state.value)
         }
     }
 
@@ -108,20 +102,6 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
             rollRepository.searchRollListRowsByStatus(query, RollStatus.ARCHIVED.value)
         }.collect { rows ->
             _state.update { it.copy(archivedRolls = rows) }
-            checkTipNag(_state.value)
-        }
-    }
-
-    /**
-     * Emits [RollListEvent.ShowTipNagPrompt] the first time the combined finished+archived
-     * roll count reaches 5, subject to the persistent [AppPreferences.tipJarPromptShown] gate
-     * and the per-session [tipNagShownThisSession] guard.
-     */
-    private fun checkTipNag(currentState: RollListUiState) {
-        val total = currentState.finishedRolls.size + currentState.archivedRolls.size
-        if (total >= 5 && !appPreferences.tipJarPromptShown && !tipNagShownThisSession) {
-            tipNagShownThisSession = true
-            viewModelScope.launch { _events.send(RollListEvent.ShowTipNagPrompt) }
         }
     }
 
@@ -191,13 +171,4 @@ class RollListViewModel(application: Application) : AndroidViewModel(application
         rollRepository.unarchiveRoll(roll.id)
     }
 
-    /** User tapped "Sure!" on the tip nag — mark it shown so it never reappears. */
-    fun onTipNagAccepted() {
-        appPreferences.tipJarPromptShown = true
-    }
-
-    /** User tapped "No thanks" on the tip nag — mark it shown so it never reappears. */
-    fun onTipNagDeclined() {
-        appPreferences.tipJarPromptShown = true
-    }
 }

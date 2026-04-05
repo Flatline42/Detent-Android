@@ -61,10 +61,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// TODO: Replace with actual Ko-fi profile URL before release
-private const val TIP_JAR_URL = "https://ko-fi.com/"
-
-
 // ---------------------------------------------------------------------------
 // Display labels for preference enums (private to this file)
 // ---------------------------------------------------------------------------
@@ -166,10 +162,6 @@ fun SettingsScreen(navController: NavHostController) {
 
                 is SettingsEvent.ResetCompleteRestartRequired -> {
                     showResetRestartDialog = true
-                }
-
-                is SettingsEvent.OpenTipJar -> {
-                    openUrl(context, TIP_JAR_URL)
                 }
 
                 is SettingsEvent.OpenOssLicenses -> {
@@ -359,23 +351,6 @@ fun SettingsScreen(navController: NavHostController) {
                 SettingsRow(
                     label = "Re-run introduction",
                     onClick = viewModel::onRerunOnboardingTapped,
-                )
-            }
-
-            item { HorizontalDivider() }
-
-            // ── Support ────────────────────────────────────────────────────
-            item { SettingsSectionHeader("SUPPORT") }
-
-            item { SupportRow(onTipJarTapped = viewModel::onTipJarTapped) }
-
-            item { HorizontalDivider(modifier = Modifier.padding(start = 16.dp)) }
-
-            // Debug: reset tip nag flag so the prompt can fire again during testing
-            item {
-                SettingsRow(
-                    label = "Reset tip nag flag (debug)",
-                    onClick = viewModel::onResetTipNagFlag,
                 )
             }
 
@@ -787,34 +762,6 @@ private fun SettingsSectionHeader(title: String) {
     )
 }
 
-/** The "Buy me a coffee" support row with descriptive text and an outlined tip jar button. */
-@Composable
-private fun SupportRow(onTipJarTapped: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Buy me a coffee",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = "If DETENT is useful to you, a tip is always appreciated",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Spacer(Modifier.width(12.dp))
-        OutlinedButton(onClick = onTipJarTapped) {
-            Text("tip jar  \u203a")
-        }
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Generic single-choice dialog (GPS precision, export format, app theme)
 // ---------------------------------------------------------------------------
@@ -860,10 +807,6 @@ private fun <T> SingleChoiceDialog(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-private fun openUrl(context: Context, url: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-}
 
 private fun restartApp(context: Context) {
     val launchIntent = context.packageManager
