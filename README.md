@@ -55,8 +55,8 @@ Requirements:
 - Android SDK — Min SDK 26, Target SDK 36
 
 ```bash
-git clone https://github.com/Flatline42/FrameLog-Android.git
-cd FrameLog-Android
+git clone https://github.com/Flatline42/Detent-Android.git
+cd Detent-Android
 ./gradlew assembleDebug
 ```
 
