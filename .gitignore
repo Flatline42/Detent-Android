@@ -38,3 +38,8 @@ detent-release.jks
 
 # Document files
 docs/
+
+# AI assistant files
+.claude/
+CLAUDE.md
+GEMINI.md
