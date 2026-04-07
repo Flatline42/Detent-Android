@@ -70,6 +70,7 @@ private val ExportFormat.label: String
         ExportFormat.CSV -> "CSV"
         ExportFormat.JSON -> "JSON"
         ExportFormat.PLAIN_TEXT -> "Plain text"
+        ExportFormat.EXIFTOOL_CSV -> "ExifTool CSV"
     }
 
 private val AppTheme.label: String

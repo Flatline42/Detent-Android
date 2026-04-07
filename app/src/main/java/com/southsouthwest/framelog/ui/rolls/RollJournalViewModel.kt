@@ -139,25 +139,32 @@ class RollJournalViewModel(
             val rollName = _state.value.roll?.roll?.name ?: "roll_$rollId"
             val format = _state.value.selectedExportFormat
 
-            val (content, mimeType, extension) = when (format) {
+            // filenameSuffix includes the dot (and any format qualifier before the extension),
+            // e.g. ".csv", ".json", "_exiftool.csv"
+            val (content, mimeType, filenameSuffix) = when (format) {
                 ExportFormat.CSV -> Triple(
                     ExportFormatter.toCsv(export),
                     "text/csv",
-                    "csv",
+                    ".csv",
                 )
                 ExportFormat.JSON -> Triple(
                     ExportFormatter.toJson(export),
                     "application/json",
-                    "json",
+                    ".json",
                 )
                 ExportFormat.PLAIN_TEXT -> Triple(
                     ExportFormatter.toPlainText(export),
                     "text/plain",
-                    "txt",
+                    ".txt",
+                )
+                ExportFormat.EXIFTOOL_CSV -> Triple(
+                    ExportFormatter.toExifToolCsv(export),
+                    "text/csv",
+                    "_exiftool.csv",
                 )
             }
 
-            val filename = sanitizeFilename(rollName) + ".$extension"
+            val filename = sanitizeFilename(rollName) + filenameSuffix
             rollRepository.updateLastExported(rollId, System.currentTimeMillis())
 
             _events.send(

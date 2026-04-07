@@ -855,7 +855,17 @@ private fun ExportFormatBottomSheet(
                         onClick = { onFormatSelected(format) },
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(format.label, style = MaterialTheme.typography.bodyLarge)
+                    Column {
+                        Text(format.label, style = MaterialTheme.typography.bodyLarge)
+                        val sublabel = format.sublabel
+                        if (sublabel != null) {
+                            Text(
+                                text = sublabel,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(16.dp))
@@ -874,6 +884,14 @@ private val ExportFormat.label: String
         ExportFormat.CSV -> "CSV"
         ExportFormat.JSON -> "JSON"
         ExportFormat.PLAIN_TEXT -> "Plain Text"
+        ExportFormat.EXIFTOOL_CSV -> "ExifTool CSV"
+    }
+
+private val ExportFormat.sublabel: String?
+    get() = when (this) {
+        ExportFormat.EXIFTOOL_CSV ->
+            "For batch EXIF tagging with ExifTool. Add scan filenames to SourceFile column before use."
+        else -> null
     }
 
 // ---------------------------------------------------------------------------

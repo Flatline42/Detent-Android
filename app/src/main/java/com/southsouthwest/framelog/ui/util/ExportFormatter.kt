@@ -16,6 +16,9 @@ object ExportFormatter {
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
 
+    // ExifTool requires "YYYY:MM:DD HH:MM:SS" — note colons in the date portion.
+    private val exifDateFormat = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US)
+
     // ---------------------------------------------------------------------------
     // CSV
     // ---------------------------------------------------------------------------
@@ -172,6 +175,68 @@ object ExportFormatter {
     }
 
     // ---------------------------------------------------------------------------
+    // ExifTool CSV
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Produces a CSV formatted for Phil Harvey's ExifTool utility.
+     *
+     * Column names map directly to ExifTool tag names so ExifTool can batch-write
+     * metadata to scanned film negatives with:
+     *   exiftool -csv=export_exiftool.csv /path/to/scans/
+     *
+     * Only logged frames are included. The SourceFile column is left empty —
+     * the user fills it in with their scan filenames before running ExifTool.
+     *
+     * No comment rows — ExifTool cannot parse # comment lines.
+     */
+    fun toExifToolCsv(export: RollExport): String = buildString {
+        appendLine("SourceFile,Make,Model,LensModel,FNumber,ExposureTime,ISO,DateTimeOriginal,GPSLatitude,GPSLongitude,GPSLatitudeRef,GPSLongitudeRef,ImageDescription,UserComment,XMP:Subject")
+
+        for (frame in export.frames) {
+            if (!frame.isLogged) continue
+
+            // "f/5.6" → "5.6"
+            val fNumber = frame.aperture?.removePrefix("f/") ?: ""
+
+            // Shutter speed as decimal seconds; "B" (bulb) is left empty
+            val exposureTime = frame.shutterSpeed?.let { parseShutterSecs(it) } ?: ""
+
+            val dateTimeOriginal = frame.loggedAt?.let { exifDateFormat.format(Date(it)) } ?: ""
+
+            // GPS: store absolute values; hemisphere goes in the Ref columns
+            val gpsLat = frame.lat?.let { if (it < 0) -it else it }?.toString() ?: ""
+            val gpsLng = frame.lng?.let { if (it < 0) -it else it }?.toString() ?: ""
+            val latRef  = frame.lat?.let { if (it >= 0) "N" else "S" } ?: ""
+            val lngRef  = frame.lng?.let { if (it >= 0) "E" else "W" } ?: ""
+
+            // XMP:Subject holds active filter names as a comma-separated list.
+            // csvEscape will quote the value if it contains commas.
+            val subject = frame.filterNames.joinToString(",")
+
+            appendLine(
+                listOf(
+                    "",                          // SourceFile — user fills in scan filenames
+                    export.cameraBodyMake,       // Make
+                    export.cameraBodyName,       // Model
+                    frame.lensName ?: "",        // LensModel
+                    fNumber,                     // FNumber
+                    exposureTime,                // ExposureTime (decimal seconds)
+                    export.ratedISO.toString(),  // ISO
+                    dateTimeOriginal,            // DateTimeOriginal ("YYYY:MM:DD HH:MM:SS")
+                    gpsLat,                      // GPSLatitude (absolute value)
+                    gpsLng,                      // GPSLongitude (absolute value)
+                    latRef,                      // GPSLatitudeRef ("N" or "S")
+                    lngRef,                      // GPSLongitudeRef ("E" or "W")
+                    frame.notes ?: "",           // ImageDescription
+                    export.filmStockName,        // UserComment (same for all frames on the roll)
+                    subject,                     // XMP:Subject (filter names)
+                ).joinToString(",") { csvEscape(it) }
+            )
+        }
+    }
+
+    // ---------------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------------
 
@@ -189,6 +254,36 @@ object ExportFormatter {
         val prefix = if (hasNull) "~" else ""
         return "$prefix-${"%.1f".format(knownSum)} EV"
     }
+
+    /**
+     * Converts a stored shutter speed string to decimal seconds for ExifTool.
+     *
+     * "1/125" → "0.008", "2s" → "2", "B" → "" (bulb cannot be represented).
+     */
+    private fun parseShutterSecs(shutterSpeed: String): String {
+        if (shutterSpeed == "B") return ""
+        // Whole-second values are stored with a trailing "s" (e.g. "1s", "30s")
+        if (shutterSpeed.endsWith("s")) {
+            val secs = shutterSpeed.dropLast(1).toDoubleOrNull() ?: return ""
+            return formatExifDecimal(secs)
+        }
+        // Fractional values are stored as "numerator/denominator" (e.g. "1/125")
+        val parts = shutterSpeed.split("/")
+        if (parts.size == 2) {
+            val num = parts[0].toDoubleOrNull() ?: return ""
+            val den = parts[1].toDoubleOrNull() ?: return ""
+            if (den == 0.0) return ""
+            return formatExifDecimal(num / den)
+        }
+        return ""
+    }
+
+    /**
+     * Formats a Double with up to 6 decimal places, stripping trailing zeros.
+     * Avoids scientific notation (e.g. 0.008 instead of 8.0E-3).
+     */
+    private fun formatExifDecimal(value: Double): String =
+        "%.6f".format(value).trimEnd('0').trimEnd('.')
 
     private fun csvEscape(value: String): String {
         // Wrap in quotes if value contains comma, quote, or newline

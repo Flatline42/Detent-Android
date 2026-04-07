@@ -215,7 +215,8 @@ class AppPreferences(context: Context) {
 enum class ExportFormat(val key: String) {
     CSV("csv"),
     JSON("json"),
-    PLAIN_TEXT("plain_text");
+    PLAIN_TEXT("plain_text"),
+    EXIFTOOL_CSV("exiftool_csv");
 
     companion object {
         fun fromKey(key: String) = entries.firstOrNull { it.key == key } ?: CSV
