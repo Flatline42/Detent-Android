@@ -161,6 +161,11 @@ fun QuickScreenScreen(
 
     // Initiates Log Frame, requesting GPS location first if the roll requires it.
     fun triggerLogFrame() {
+        // Immediate press feedback — fires before any DB or GPS work begins.
+        // Gives the user instant confirmation that the tap registered, which is
+        // especially important when there is a Room cold-start delay after phone sleep.
+        vibrateIncrement(context)
+
         val gpsEnabled = state.activeRoll?.roll?.gpsEnabled == true
         if (!gpsEnabled) {
             viewModel.onLogFrameTapped(null, null)

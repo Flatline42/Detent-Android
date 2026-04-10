@@ -23,6 +23,14 @@ abstract class RollDao {
     // ---------------------------------------------------------------------------
 
     /**
+     * Lightweight pre-warm query — returns the number of rolls in the database.
+     * Called from MainActivity.onResume() on a background thread to open the Room
+     * connection before the user taps Log Frame, avoiding the cold-start delay.
+     */
+    @Query("SELECT COUNT(*) FROM rolls")
+    abstract suspend fun getRollCount(): Int
+
+    /**
      * Returns all rolls currently loaded in a camera (isLoaded = true) with full details.
      * The "active roll" for the widget is selected from this list via SharedPreferences.
      * Called on app launch and to populate the Quick Screen header switcher.
